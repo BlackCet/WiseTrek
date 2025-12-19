@@ -9,6 +9,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+//routes
+const weatherRoutes = require("./routes/weatherRoutes");
+
+
+//routes use
+app.use("/api/weather", weatherRoutes);
+
 // 🔹 MongoDB connection
 mongoose
   .connect(process.env.MONGO_URI)
