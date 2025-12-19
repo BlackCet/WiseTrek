@@ -11,10 +11,11 @@ app.use(express.json());
 
 //routes
 const weatherRoutes = require("./routes/weatherRoutes");
-
+const plannerRoutes = require("./routes/plannerRoutes");
 
 //routes use
 app.use("/api/weather", weatherRoutes);
+app.use("/api/planner", plannerRoutes);
 
 // 🔹 MongoDB connection
 mongoose

@@ -19,7 +19,34 @@ const getWeatherByCity = async (city) => {
   };
 };
 
-module.exports = { getWeatherByCity };
+const getWeatherRecommendation = (weather) => {
+  const { temperature, condition } = weather;
+
+  if (temperature >= 38) {
+    return "Very hot weather 🌞. Avoid outdoor travel during noon. Prefer mornings or evenings.";
+  }
+
+  if (temperature >= 30 && temperature < 38) {
+    return "Warm weather 😊. Good for sightseeing with hydration breaks.";
+  }
+
+  if (temperature >= 20 && temperature < 30) {
+    return "Pleasant weather 🌤️. Ideal for outdoor activities and travel.";
+  }
+
+  if (temperature < 20) {
+    return "Cool weather ❄️. Carry light warm clothes, good for walking tours.";
+  }
+
+  if (condition.includes("rain")) {
+    return "Rainy conditions 🌧️. Consider indoor activities or carry rain protection.";
+  }
+
+  return "Weather conditions are moderate. Plan accordingly.";
+};
+
+
+module.exports = { getWeatherByCity, getWeatherRecommendation };
 
 
 

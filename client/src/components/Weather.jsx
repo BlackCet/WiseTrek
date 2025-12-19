@@ -4,9 +4,12 @@ const Weather = () => {
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
 
   const fetchWeather = async () => {
     try {
+      setLoading(true);
       setError("");
       setWeather(null);
 
@@ -23,11 +26,17 @@ const Weather = () => {
       setWeather(data);
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "400px" }}>
+    <div style={{ padding: "20px",
+  maxWidth: "400px",
+  margin: "50px auto",
+  borderRadius: "8px",
+  boxShadow: "0 0 10px rgba(0,0,0,0.1)" }}>
       <h2>🌦 Weather Information</h2>
 
       <input
@@ -40,12 +49,16 @@ const Weather = () => {
 
       <button
         onClick={fetchWeather}
-        style={{ marginTop: "10px", padding: "8px", width: "100%" }}
+        disabled={!city || loading}
+        style={{ marginTop: "10px", padding: "8px", width: "100%", cursor:city?"pointer":"not-allowed" }}
       >
         Get Weather
       </button>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p style={{ color: "crimson" }}>⚠ {error}</p>}
+
+      {loading && <p>Loading weather data...</p>}
+
 
       {weather && (
         <div style={{ marginTop: "15px" }}>
@@ -54,6 +67,12 @@ const Weather = () => {
           <p><b>Feels Like:</b> {weather.feelsLike}°C</p>
           <p><b>Humidity:</b> {weather.humidity}%</p>
           <p><b>Condition:</b> {weather.condition}</p>
+          {weather.recommendation && (
+  <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+    💡 {weather.recommendation}
+  </p>
+)}
+
         </div>
       )}
     </div>

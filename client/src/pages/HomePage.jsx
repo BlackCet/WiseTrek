@@ -27,6 +27,11 @@ function HomePage() {
        WISETREK
       </Typography>
 
+      
+<h1 className="text-3xl font-bold text-purple-600">
+  Tailwind v4 is working 🚀
+</h1>
+
 
       <Typography variant="body1" paragraph>
         This is the starting point for your application. Use the components below to build out your features.

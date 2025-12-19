@@ -1,4 +1,4 @@
-const { getWeatherByCity } = require("../services/weatherService");
+const { getWeatherByCity, getWeatherRecommendation } = require("../services/weatherService");
 
 const getWeather = async (req, res) => {
   try {
@@ -9,7 +9,8 @@ const getWeather = async (req, res) => {
     }
 
     const weather = await getWeatherByCity(city);
-    res.status(200).json(weather);
+    const recommendation = getWeatherRecommendation(weather);
+    res.status(200).json({...weather, recommendation });
 
   } catch (error) {
     res.status(500).json({
