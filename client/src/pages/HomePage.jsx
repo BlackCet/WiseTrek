@@ -1,56 +1,229 @@
-import React, { useState, useEffect } from 'react';
-import { Typography, Button, Paper, CircularProgress, Box } from '@mui/material';
-import { Menu } from '@headlessui/react';
+import React, { useState } from 'react';
+import { 
+  Typography, Button, Paper, Box, TextField, Stack, 
+  Card, CardMedia, CardContent, CardActions, Grid, 
+  CircularProgress, Divider, Container, MenuItem 
+} from '@mui/material';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import PlaceIcon from '@mui/icons-material/Place';
 import apiService from '../services/apiService';
+import '../index.css'; // Ensure Tailwind is loaded
+
+// Individual Styled Event Card
+const EventCard = ({ event }) => (
+  // Added border-wisetrek-300 for the theme border color
+  <Card className="event-card border-2 border-wisetrek-300" sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 4, boxShadow: 3 }}>
+    <Box sx={{ overflow: 'hidden' }}>
+      <CardMedia
+        className="event-card-media"
+        component="img"
+        height="180"
+        image={event.thumbnail || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=500'}
+        alt={event.title}
+      />
+    </Box>
+    {/* Background color changed to wisetrek-100 (Cream) */}
+    <CardContent sx={{ flexGrow: 1 }} className="bg-wisetrek-100">
+      {/* Title color changed to wisetrek-400 (Clay) */}
+      <Typography variant="h6" className="event-title font-bold text-wisetrek-400 mb-1">
+        {event.title}
+      </Typography>
+      <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+        {/* Icon color changed to wisetrek-400 */}
+        <CalendarMonthIcon fontSize="small" className="text-wisetrek-400" />
+        <Typography variant="body2" className="text-wisetrek-400 opacity-80">{event.date?.when || "View Schedule"}</Typography>
+      </Stack>
+      <Stack direction="row" spacing={1}>
+        {/* Icon color changed to wisetrek-400 */}
+        <PlaceIcon fontSize="small" className="text-wisetrek-400" />
+        <Typography variant="body2" className="text-wisetrek-400 opacity-80">{event.venue?.name || "Local Venue"}</Typography>
+      </Stack>
+    </CardContent>
+    <Divider className="border-wisetrek-300" />
+    {/* Actions area background changed to wisetrek-200 (Peach) */}
+    <CardActions sx={{ p: 2 }} className="bg-wisetrek-200">
+      <Button 
+        fullWidth 
+        variant="contained" 
+        href={event.link} 
+        target="_blank" 
+        sx={{ borderRadius: 2 }}
+        // Button background changed to wisetrek-400 (Clay)
+        className="bg-wisetrek-400 hover:bg-wisetrek-300 text-white shadow-none"
+      >
+        Book Tickets
+      </Button>
+    </CardActions>
+  </Card>
+);
 
 function HomePage() {
-  const [message, setMessage] = useState('');
-  const [loading, setLoading] = useState(true);
+  const initialForm = { destination: '', startDate: '', endDate: '', category: '' };
+  const [formData, setFormData] = useState(initialForm);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
-  useEffect(() => {
-    apiService.get('/test')
-      .then(response => {
-        setMessage(response.data.message);
-      })
-      .catch(error => {
-        console.error("Error fetching data:", error);
-        setMessage("Could not connect to the backend.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
+
+  const handleClear = () => {
+    setFormData(initialForm);
+    setEvents([]);
+    setHasSearched(false);
+  };
+
+  const handleSearch = async (e) => {
+    e.preventDefault(); 
+    setLoading(true);
+    setHasSearched(true);
+    
+    try {
+      const params = { ...formData };
+      const response = await apiService.get('/search-events', { params });
+      setEvents(response.data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <Paper elevation={3} sx={{ padding: 4 }}>
-      <Typography variant="h3" component="h1" gutterBottom>
-       WISETREK
-      </Typography>
+    // Main Background changed to wisetrek-100 (Cream)
+    <div className="min-h-screen bg-wisetrek-100">
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        {/* Title color changed to wisetrek-400 */}
+        <Typography variant="h2" align="center" className="font-black text-wisetrek-400 mb-8">
+          WISETREK
+        </Typography>
+        
+        <Paper elevation={4} sx={{ p: 4, borderRadius: 4, mb: 6 }} className="border-2 border-wisetrek-300">
+          <form onSubmit={handleSearch}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={12} md={3}>
+                <TextField 
+                  fullWidth 
+                  label="Destination" 
+                  name="destination" 
+                  value={formData.destination} 
+                  onChange={handleChange} 
+                  required 
+                  // Customizing MUI Input colors to match theme
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '&.Mui-focused fieldset': { borderColor: '#D8AE7E' }, // wisetrek-400
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#D8AE7E' }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={2}>
+                <TextField 
+                  select 
+                  fullWidth 
+                  label="Category" 
+                  name="category" 
+                  value={formData.category} 
+                  onChange={handleChange}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                        '&.Mui-focused fieldset': { borderColor: '#D8AE7E' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#D8AE7E' }
+                  }}
+                >
+                  <MenuItem value="">All Events</MenuItem>
+                  <MenuItem value="music">Music</MenuItem>
+                  <MenuItem value="cricket">Cricket</MenuItem>
+                  <MenuItem value="comedy">Comedy Shows</MenuItem>
+                </TextField>
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <TextField 
+                   fullWidth 
+                   label="From" 
+                   type="date" 
+                   name="startDate" 
+                   value={formData.startDate} 
+                   InputLabelProps={{ shrink: true }} 
+                   onChange={handleChange} 
+                   sx={{
+                    '& .MuiOutlinedInput-root': {
+                        '&.Mui-focused fieldset': { borderColor: '#D8AE7E' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#D8AE7E' }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={6} md={2}>
+                <TextField 
+                   fullWidth 
+                   label="To" 
+                   type="date" 
+                   name="endDate" 
+                   value={formData.endDate} 
+                   InputLabelProps={{ shrink: true }} 
+                   onChange={handleChange} 
+                   sx={{
+                    '& .MuiOutlinedInput-root': {
+                        '&.Mui-focused fieldset': { borderColor: '#D8AE7E' },
+                    },
+                    '& .MuiInputLabel-root.Mui-focused': { color: '#D8AE7E' }
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} md={3}>
+                <Stack direction="row" spacing={1}>
+                  <Button 
+                    type="submit" 
+                    variant="contained" 
+                    fullWidth 
+                    sx={{ height: 56, fontWeight: 'bold' }}
+                    // Button bg -> wisetrek-400
+                    className="bg-wisetrek-400 hover:bg-wisetrek-300 text-white shadow-none"
+                  >
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Explore"}
+                  </Button>
+                  <Button 
+                    variant="outlined" 
+                    onClick={handleClear} 
+                    sx={{ height: 56 }}
+                    // Outline Button -> wisetrek-400 text and border
+                    className="border-wisetrek-400 text-wisetrek-400 hover:bg-wisetrek-200"
+                  >
+                    Clear
+                  </Button>
+                </Stack>
+              </Grid>
+            </Grid>
+          </form>
+        </Paper>
 
-
-      <Typography variant="body1" paragraph>
-        This is the starting point for your application. Use the components below to build out your features.
-      </Typography>
-
-      <Box sx={{ display: 'flex', gap: 2, mt: 3, alignItems: 'center' }}>
-        {/* Example of a Material-UI button */}
-        <Button variant="contained">Plan a New Trip</Button>
-
-        {/* Example of a Headless UI Menu component */}
-        <div style={{ position: 'relative', display: 'inline-block' }}>
-           <Menu>
-             <Menu.Button as={Button} variant="outlined">
-               Options
-             </Menu.Button>
-             {/* Style this Menu.Items with CSS or a library like Tailwind */}
-             <Menu.Items style={{ position: 'absolute', background: 'white', border: '1px solid #ccc', borderRadius: '4px', marginTop: '8px', padding: '8px', zIndex: 10 }}>
-               <Menu.Item><a href="/account-settings"><Typography sx={{ p: 1 }}>Account settings</Typography></a></Menu.Item>
-               <Menu.Item><a href="/documentation"><Typography sx={{ p: 1 }}>Documentation</Typography></a></Menu.Item>
-             </Menu.Items>
-           </Menu>
-         </div>
-      </Box>
-    </Paper>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
+            {/* Spinner color -> wisetrek-400 */}
+            <CircularProgress size={60} sx={{ color: '#D8AE7E' }} />
+          </Box>
+        ) : (
+          <Grid container spacing={4}>
+            {events.map((item, index) => (
+              <Grid item xs={12} sm={6} md={4} key={index}><EventCard event={item} /></Grid>
+            ))}
+          </Grid>
+        )}
+        
+        {hasSearched && events.length === 0 && !loading && (
+          <Box sx={{ mt: 4, textAlign: 'center' }}>
+            <Typography color="text.secondary" variant="h6" className="text-wisetrek-400">
+              No events found for {formData.destination}.
+            </Typography>
+            <Typography variant="body2" className="text-wisetrek-400 opacity-70" sx={{ mt: 1 }}>
+              Try searching for a major city or a broader category.
+            </Typography>
+          </Box>
+        )}
+      </Container>
+    </div>
   );
 }
 

@@ -1,0 +1,8 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wisetrek-100: #FFF2D7;
+  --color-wisetrek-200: #FFE0B5;
+  --color-wisetrek-300: #F8C794;
+  --color-wisetrek-400: #D8AE7E;
+}

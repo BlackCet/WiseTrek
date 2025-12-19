@@ -1,24 +1,26 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const connectDB = require('./db'); // Import the DB function
+const eventRoutes = require('./routes/eventRoutes');
 
 const app = express();
 
-// const connectDB = require('./db');
-// connectDB();
+// Initialize Database
+connectDB();
 
-app.use(cors());
+// Middleware
+app.use(cors()); 
 app.use(express.json());
 
+// Routes
+app.use('/api', eventRoutes);
+
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Hello from the backend! The server is up and running.' });
+  res.json({ status: "Server is healthy and running" });
 });
 
-// const tripRoutes = require('./routes/trips');
-// app.use('/api/trips', tripRoutes);
-
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
