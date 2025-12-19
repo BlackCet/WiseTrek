@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Typography, Button, Paper, Box, TextField, Stack, 
   Card, CardMedia, CardContent, CardActions, Grid, 
@@ -6,12 +7,12 @@ import {
 } from '@mui/material';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 import PlaceIcon from '@mui/icons-material/Place';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome'; // Added missing import
 import apiService from '../services/apiService';
-import '../index.css'; // Ensure Tailwind is loaded
+import '../index.css'; 
 
 // Individual Styled Event Card
 const EventCard = ({ event }) => (
-  // Added border-wisetrek-300 for the theme border color
   <Card className="event-card border-2 border-wisetrek-300" sx={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 4, boxShadow: 3 }}>
     <Box sx={{ overflow: 'hidden' }}>
       <CardMedia
@@ -22,25 +23,20 @@ const EventCard = ({ event }) => (
         alt={event.title}
       />
     </Box>
-    {/* Background color changed to wisetrek-100 (Cream) */}
     <CardContent sx={{ flexGrow: 1 }} className="bg-wisetrek-100">
-      {/* Title color changed to wisetrek-400 (Clay) */}
       <Typography variant="h6" className="event-title font-bold text-wisetrek-400 mb-1">
         {event.title}
       </Typography>
       <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-        {/* Icon color changed to wisetrek-400 */}
         <CalendarMonthIcon fontSize="small" className="text-wisetrek-400" />
         <Typography variant="body2" className="text-wisetrek-400 opacity-80">{event.date?.when || "View Schedule"}</Typography>
       </Stack>
       <Stack direction="row" spacing={1}>
-        {/* Icon color changed to wisetrek-400 */}
         <PlaceIcon fontSize="small" className="text-wisetrek-400" />
         <Typography variant="body2" className="text-wisetrek-400 opacity-80">{event.venue?.name || "Local Venue"}</Typography>
       </Stack>
     </CardContent>
     <Divider className="border-wisetrek-300" />
-    {/* Actions area background changed to wisetrek-200 (Peach) */}
     <CardActions sx={{ p: 2 }} className="bg-wisetrek-200">
       <Button 
         fullWidth 
@@ -48,7 +44,6 @@ const EventCard = ({ event }) => (
         href={event.link} 
         target="_blank" 
         sx={{ borderRadius: 2 }}
-        // Button background changed to wisetrek-400 (Clay)
         className="bg-wisetrek-400 hover:bg-wisetrek-300 text-white shadow-none"
       >
         Book Tickets
@@ -58,6 +53,9 @@ const EventCard = ({ event }) => (
 );
 
 function HomePage() {
+  // ✅ FIX: Hook called INSIDE the component
+  const navigate = useNavigate();
+
   const initialForm = { destination: '', startDate: '', endDate: '', category: '' };
   const [formData, setFormData] = useState(initialForm);
   const [events, setEvents] = useState([]);
@@ -89,10 +87,8 @@ function HomePage() {
   };
 
   return (
-    // Main Background changed to wisetrek-100 (Cream)
     <div className="min-h-screen bg-wisetrek-100">
       <Container maxWidth="lg" sx={{ py: 6 }}>
-        {/* Title color changed to wisetrek-400 */}
         <Typography variant="h2" align="center" className="font-black text-wisetrek-400 mb-8">
           WISETREK
         </Typography>
@@ -108,10 +104,9 @@ function HomePage() {
                   value={formData.destination} 
                   onChange={handleChange} 
                   required 
-                  // Customizing MUI Input colors to match theme
                   sx={{
                     '& .MuiOutlinedInput-root': {
-                      '&.Mui-focused fieldset': { borderColor: '#D8AE7E' }, // wisetrek-400
+                      '&.Mui-focused fieldset': { borderColor: '#D8AE7E' }, 
                     },
                     '& .MuiInputLabel-root.Mui-focused': { color: '#D8AE7E' }
                   }}
@@ -179,7 +174,6 @@ function HomePage() {
                     variant="contained" 
                     fullWidth 
                     sx={{ height: 56, fontWeight: 'bold' }}
-                    // Button bg -> wisetrek-400
                     className="bg-wisetrek-400 hover:bg-wisetrek-300 text-white shadow-none"
                   >
                     {loading ? <CircularProgress size={24} color="inherit" /> : "Explore"}
@@ -188,7 +182,6 @@ function HomePage() {
                     variant="outlined" 
                     onClick={handleClear} 
                     sx={{ height: 56 }}
-                    // Outline Button -> wisetrek-400 text and border
                     className="border-wisetrek-400 text-wisetrek-400 hover:bg-wisetrek-200"
                   >
                     Clear
@@ -197,11 +190,24 @@ function HomePage() {
               </Grid>
             </Grid>
           </form>
+
+          {/* AI Button Section */}
+          <Box className="mt-6 mb-2 text-center">
+            <Button 
+              onClick={() => navigate('/ai-planner', { 
+                state: { destination: formData.destination, category: formData.category } 
+              })}
+              variant="contained"
+              startIcon={<AutoAwesomeIcon />}
+              className="bg-black text-white font-bold py-3 px-8 rounded-full shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all"
+            >
+              Plan a Full Trip for {formData.destination || "Your Next Destination"}
+            </Button>
+          </Box>
         </Paper>
 
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', my: 10 }}>
-            {/* Spinner color -> wisetrek-400 */}
             <CircularProgress size={60} sx={{ color: '#D8AE7E' }} />
           </Box>
         ) : (

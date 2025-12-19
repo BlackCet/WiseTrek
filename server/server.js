@@ -3,7 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 const connectDB = require('./db'); // Import the DB function
 const eventRoutes = require('./routes/eventRoutes');
-
+const aiRoutes = require('./routes/aiRoutes');
 const app = express();
 
 // Initialize Database
@@ -15,7 +15,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api', eventRoutes);
-
+app.use('/api/ai', aiRoutes);
 app.get('/api/test', (req, res) => {
   res.json({ status: "Server is healthy and running" });
 });
