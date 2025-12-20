@@ -2,224 +2,151 @@ import React, { useState, useRef, useEffect } from 'react';
 import { 
   Box, Paper, Typography, TextField, IconButton, Fab, Avatar, Slide 
 } from '@mui/material';
-import ChatIcon from '@mui/icons-material/Chat';
-import CloseIcon from '@mui/icons-material/Close';
-import SendIcon from '@mui/icons-material/Send';
-import SmartToyIcon from '@mui/icons-material/SmartToy';
+import { Send, MessageCircle, Sparkles, X, Bot } from 'lucide-react';
 
-// --- 🧠 THE BRAIN (Knowledge Base) ---
-// This acts as your "Free AI". Add as many rules as you want.
 const KNOWLEDGE_BASE = [
-  // --- 1. GREETINGS & PERSONALITY ---
-  { 
-    keywords: ['hi', 'hello', 'hey', 'greetings', 'morning', 'evening', 'sup', 'yo'], 
-    answer: "Greetings, traveler! I am the WiseTrek Assistant. Ready to help you navigate the modern world with vintage charm. What's on your mind?" 
-  },
-  { 
-    keywords: ['who are you', 'what do you do', 'your name', 'bot', 'help'], 
-    answer: "I am the WiseTrek Station Master! I can help you find events, explain our AI Trip Planner, or assist with booking questions. Just type a keyword like 'refund', 'tickets', or 'Delhi'!" 
-  },
-
-  // --- 2. BOOKING & PAYMENTS (The Essentials) ---
-  { 
-    keywords: ['book', 'ticket', 'buy', 'purchase', 'price', 'cost', 'how much', 'reservation'], 
-    answer: "To secure your spot, click the 'Book Tickets' button on any event card. This will take you directly to the official vendor's booth. We don't handle the cash here at the station—we just point you to the right platform!" 
-  },
-  { 
-    keywords: ['refund', 'money', 'cancel', 'return', 'wrong ticket', 'mistake'], 
-    answer: "Change of heart? Since we refer you to outside vendors (like BookMyShow or Ticketmaster), you'll need to follow their specific refund policy found in your confirmation email." 
-  },
-  { 
-    keywords: ['confirmation', 'email', 'not received', 'receipt', 'invoice'], 
-    answer: "If the telegraph (email) hasn't arrived, please check your 'Spam' folder. If it's still missing, you'll need to contact the specific ticket provider you purchased from." 
-  },
-
-  // --- 3. AI TRIP PLANNER (Feature Support) ---
-  { 
-    keywords: ['ai', 'plan', 'trip', 'itinerary', 'planner', 'advisor', 'suggest', 'route'], 
-    answer: "Our AI Advisor is world-class! Head to the Home Page and click the black 'Plan a Full Trip' button. It will generate a custom 1-day itinerary just for you." 
-  },
-  { 
-    keywords: ['vintage', '1920', 'theme', 'why'], 
-    answer: "WiseTrek celebrates the 'Golden Age of Travel.' We believe modern journeys are better with a touch of classic elegance and storytelling." 
-  },
-
-  // --- 4. TECHNICAL ISSUES (Troubleshooting) ---
-  { 
-    keywords: ['broken', 'not working', 'error', 'slow', 'spin', 'stuck', 'blank', 'empty', 'bug'], 
-    answer: "Terribly sorry for the technical hiccup! Try refreshing your browser (F5). If the AI is stuck, our 'Station Master' might be over capacity—give it a minute and try again." 
-  },
-  { 
-    keywords: ['search', 'no results', 'found nothing', 'not showing', 'where is'], 
-    answer: "If your search is coming up empty, try broadening your destination (e.g., 'Mumbai' instead of a small neighborhood) or selecting 'All Events' in the category menu." 
-  },
-
-  // --- 5. CATEGORY SPECIFIC QUERIES ---
-  { 
-    keywords: ['music', 'concert', 'gig', 'show', 'band', 'dj', 'festival'], 
-    answer: "Seeking some rhythm? Set your category to 'Music' on the home page. We track everything from underground jazz to grand stadium concerts." 
-  },
-  { 
-    keywords: ['sport', 'cricket', 'ipl', 'match', 'stadium', 'game'], 
-    answer: "For the sporting soul! Search for your city and select the 'Cricket' or 'Sport' category to find the next big match." 
-  },
-  { 
-    keywords: ['food', 'eat', 'restaurant', 'dinner', 'cafe', 'hungry'], 
-    answer: "While we specialize in events, our AI Trip Planner loves suggesting historic breakfast spots and hidden gem dinners. Give it a try!" 
-  },
-
-  // --- 6. MISC & CONTACT ---
-  { 
-    keywords: ['contact', 'email', 'phone', 'support', 'human', 'talk to someone', 'address'], 
-    answer: "Need a human touch? You can reach our head office at support@wisetrek.com. We usually reply within one business day." 
-  },
-  { 
-    keywords: ['thank', 'thanks', 'cool', 'great', 'awesome', 'bye', 'goodbye'], 
-    answer: "You are most welcome! Safe travels, and may your journey be filled with wonder. Farewell for now!" 
-  }
+  { keywords: ['hi', 'hello', 'hey'], answer: "Greetings, traveler! I am the WiseTrek Assistant. Ready to help you navigate with vintage charm." },
+  { keywords: ['ai', 'plan', 'itinerary'], answer: "Our AI Advisor is world-class! Click the 'AI Plan' button on the homepage for a custom journey." },
+  { keywords: ['ticket', 'book'], answer: "Secure your spot by clicking 'Book Tickets' on any event card. We'll guide you to the official vendor!" },
+  { keywords: ['thank', 'thanks'], answer: "You're most welcome! Safe travels!" }
 ];
 
-const DEFAULT_ANSWER = "I beg your pardon? I didn't quite catch that. Try asking about 'tickets', 'refunds', or 'AI planning'.";
+const DEFAULT_ANSWER = "I beg your pardon? Try asking about 'tickets', 'AI planning', or 'destinations'.";
 
 function ChatBot() {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { text: "Welcome to WiseTrek! How can I help you?", isBot: true }
-  ]);
+  const [isTyping, setIsTyping] = useState(false);
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([
+    { text: "Welcome to WiseTrek! How can I help you today?", isBot: true, timestamp: new Date() }
+  ]);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSend = () => {
     if (!input.trim()) return;
-
-    // 1. Add User Message
-    const userMsg = { text: input, isBot: false };
+    const userMsg = { text: input, isBot: false, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
-    
     const lowerInput = input.toLowerCase();
     setInput("");
+    setIsTyping(true);
 
-    // 2. Find the Answer (The Logic)
-    let botResponse = DEFAULT_ANSWER;
-    
-    // Check if input contains any keyword from our knowledge base
-    const foundRule = KNOWLEDGE_BASE.find(rule => 
-      rule.keywords.some(keyword => lowerInput.includes(keyword))
-    );
-
-    if (foundRule) {
-      botResponse = foundRule.answer;
-    }
-
-    // 3. Add Bot Message (with a tiny fake delay for realism)
     setTimeout(() => {
-      setMessages((prev) => [...prev, { text: botResponse, isBot: true }]);
-    }, 600);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') handleSend();
+      let botResponse = DEFAULT_ANSWER;
+      const foundRule = KNOWLEDGE_BASE.find(rule => 
+        rule.keywords.some(keyword => lowerInput.includes(keyword))
+      );
+      if (foundRule) botResponse = foundRule.answer;
+      setMessages((prev) => [...prev, { text: botResponse, isBot: true, timestamp: new Date() }]);
+      setIsTyping(false);
+    }, 1200);
   };
 
   return (
     <>
-      {/* --- Floating Action Button (The Trigger) --- */}
+      {/* Floating Action Button - FIXED to the viewport */}
       <Fab 
-        color="primary" 
-        aria-label="chat"
         onClick={() => setIsOpen(!isOpen)}
-        sx={{
-          position: 'fixed',
-          bottom: 24,
-          right: 24,
-          backgroundColor: '#D8AE7E', // Clay
-          '&:hover': { backgroundColor: '#C09A6E' },
-          zIndex: 1000
+        className="fixed bottom-6 right-6 z-[9999] transition-all duration-300"
+        sx={{ 
+          position: 'fixed', // Force fixed
+          bottom: '24px',
+          right: '24px',
+          bgcolor: 'var(--primary)', 
+          color: 'var(--primary-foreground)', 
+          display: isOpen ? 'none' : 'flex', // Hide when open to show the 'X' in the header instead
+          '&:hover': { bgcolor: 'var(--primary)' } 
         }}
       >
-        {isOpen ? <CloseIcon /> : <ChatIcon />}
+        <MessageCircle className="w-6 h-6" />
       </Fab>
 
-      {/* --- The Chat Window --- */}
+      {/* Chat Window - FIXED to the viewport */}
       <Slide direction="up" in={isOpen} mountOnEnter unmountOnExit>
         <Paper 
-          elevation={6}
+          elevation={12}
+          className="fixed z-[9999] flex flex-col overflow-hidden shadow-2xl"
           sx={{
             position: 'fixed',
-            bottom: 100,
-            right: 24,
-            width: 320,
-            height: 450,
-            display: 'flex',
-            flexDirection: 'column',
-            borderRadius: 4,
-            overflow: 'hidden',
-            zIndex: 1000,
-            border: '2px solid #D8AE7E'
+            bottom: '24px', // Aligns with where the Fab was
+            right: '24px',
+            width: '350px',
+            height: '500px',
+            borderRadius: '2rem',
+            maxWidth: 'calc(100vw - 48px)',
+            maxHeight: 'calc(100vh - 48px)',
           }}
         >
           {/* Header */}
-          <Box sx={{ bgcolor: '#D8AE7E', p: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <SmartToyIcon sx={{ color: 'white' }} />
-            <Typography variant="subtitle1" sx={{ color: 'white', fontWeight: 'bold' }}>
-              Station Master
-            </Typography>
+          <Box className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                <Sparkles className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <Typography className="text-white font-bold leading-tight">Station Master</Typography>
+                <Typography className="text-white/70 text-[10px] uppercase tracking-wider">AI Assistant</Typography>
+              </div>
+            </div>
+            <IconButton onClick={() => setIsOpen(false)} size="small" className="text-white/80 hover:bg-white/10">
+              <X className="w-5 h-5" />
+            </IconButton>
           </Box>
 
           {/* Messages Area */}
-          <Box sx={{ flexGrow: 1, p: 2, overflowY: 'auto', bgcolor: '#FFF2D7' }}>
+          <Box className="flex-1 p-4 overflow-y-auto bg-gray-50/50 space-y-4">
             {messages.map((msg, index) => (
-              <Box 
-                key={index} 
-                sx={{ 
-                  display: 'flex', 
-                  justifyContent: msg.isBot ? 'flex-start' : 'flex-end',
-                  mb: 2 
-                }}
-              >
-                {msg.isBot && <Avatar sx={{ width: 28, height: 28, bgcolor: '#D8AE7E', mr: 1, fontSize: 12 }}>WT</Avatar>}
-                <Paper 
-                  elevation={1}
-                  sx={{ 
-                    p: 1.5, 
-                    maxWidth: '80%', 
-                    borderRadius: 2,
-                    bgcolor: msg.isBot ? 'white' : '#D8AE7E',
-                    color: msg.isBot ? 'black' : 'white',
-                    fontSize: '0.9rem'
-                  }}
-                >
-                  {msg.text}
-                </Paper>
-              </Box>
+              <div key={index} className={`flex ${msg.isBot ? 'justify-start' : 'justify-end'}`}>
+                <div className={`flex gap-2 max-w-[85%] ${msg.isBot ? 'flex-row' : 'flex-row-reverse'}`}>
+                  {msg.isBot && <Avatar className="w-8 h-8 bg-blue-100 text-blue-600"><Bot size={16}/></Avatar>}
+                  <div className={`p-3 rounded-2xl text-sm shadow-sm ${
+                    msg.isBot 
+                      ? 'bg-white text-gray-800 rounded-tl-none border border-gray-100' 
+                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-tr-none'
+                  }`}>
+                    {msg.text}
+                    <span className={`block text-[10px] mt-1 opacity-50 ${msg.isBot ? 'text-gray-500' : 'text-white'}`}>
+                      {msg.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                </div>
+              </div>
             ))}
+            
+            {isTyping && (
+              <div className="flex justify-start items-center gap-2">
+                <Avatar className="w-8 h-8 bg-gray-100"><Bot size={16} className="text-gray-400"/></Avatar>
+                <div className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm flex gap-1 border border-gray-100">
+                  <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce" />
+                  <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce [animation-delay:0.2s]" />
+                  <span className="w-1.5 h-1.5 bg-gray-300 rounded-full animate-bounce [animation-delay:0.4s]" />
+                </div>
+              </div>
+            )}
             <div ref={messagesEndRef} />
           </Box>
 
           {/* Input Area */}
-          <Box sx={{ p: 1, bgcolor: 'white', borderTop: '1px solid #eee', display: 'flex', gap: 1 }}>
+          <Box className="p-4 bg-white border-t border-gray-100 flex gap-2 items-center">
             <TextField 
               fullWidth 
-              placeholder="Ask for help..." 
-              variant="outlined"
-              size="small"
+              placeholder="Ask WiseTrek..." 
+              variant="standard"
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  borderRadius: 3,
-                  '&.Mui-focused fieldset': { borderColor: '#D8AE7E' }, 
-                }
-              }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              InputProps={{ disableUnderline: true }}
+              className="bg-gray-100 px-4 py-2 rounded-full text-sm"
             />
-            <IconButton onClick={handleSend} color="primary" sx={{ color: '#D8AE7E' }}>
-              <SendIcon />
+            <IconButton 
+              onClick={handleSend} 
+              disabled={!input.trim()}
+              className="bg-blue-600 hover:bg-blue-700 text-white disabled:bg-gray-200"
+            >
+              <Send className="w-4 h-4" />
             </IconButton>
           </Box>
         </Paper>

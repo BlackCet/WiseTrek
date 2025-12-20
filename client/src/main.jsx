@@ -4,63 +4,91 @@ import App from './App';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import './index.css'; 
 
-// WiseTrek Theme Palette
-// 100: #FFF2D7 (Cream)
-// 200: #FFE0B5 (Peach)
-// 300: #F8C794 (Sand)
-// 400: #D8AE7E (Clay)
-
+// This theme pulls directly from your @theme inline CSS variables
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#D8AE7E', // Clay (Buttons, Highlights)
+      main: '#030213', // Matches --primary
       contrastText: '#ffffff',
     },
     secondary: {
-      main: '#F8C794', // Sand
+      main: '#717182', // Matches --muted-foreground
     },
     background: {
-      default: '#FFF2D7', // Cream Background
-      paper: '#ffffff',   
+      default: '#ffffff', // Matches --background
+      paper: '#ffffff',   // Matches --card
     },
     text: {
-      // UPDATED: Darker colors for better readability
-      primary: '#2C1810',   // Very Dark Brown (Almost Black)
-      secondary: '#5D4037', // Medium Dark Brown
+      primary: '#030213',   // Matches --foreground
+      secondary: '#717182', // Matches --muted-foreground
     },
+    error: {
+      main: '#d4183d', // Matches --destructive
+    },
+    divider: 'rgba(0, 0, 0, 0.1)', // Matches --border
   },
   
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    allVariants: {
-      color: '#2C1810', // Forces all text to be the dark brown by default
-    },
-    h2: {
-      fontWeight: 900,
-      color: '#D8AE7E', // Keep the big title in Clay color
-    },
-    h3: {
-      fontWeight: 700,
-    },
+    // Matches your CSS variable font-weights
+    fontFamily: 'Inter, system-ui, sans-serif',
+    h1: { fontWeight: 500 }, 
+    h2: { fontWeight: 500 },
+    h3: { fontWeight: 500 },
     button: {
-      fontWeight: 'bold',
-      textTransform: 'none',
+      fontWeight: 500,
+      textTransform: 'none', 
     }
   },
-  
+
+  shape: {
+    borderRadius: 10, // Matches --radius (0.625rem)
+  },
+
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
+          // Using the CSS variable ensures it updates if you change CSS
+          borderRadius: 'var(--radius-lg)', 
+          padding: '10px 24px',
           boxShadow: 'none',
+          backgroundColor: 'var(--primary)',
+          color: 'var(--primary-foreground)',
+          '&:hover': {
+            backgroundColor: 'var(--accent)',
+            color: 'var(--accent-foreground)',
+            boxShadow: 'none',
+          },
         },
       },
     },
     MuiPaper: {
       styleOverrides: {
-        rounded: {
-          borderRadius: 16,
+        root: {
+          backgroundColor: 'var(--card)',
+          color: 'var(--card-foreground)',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid var(--border)',
+          backgroundImage: 'none', // Fixes MUI dark mode overlay issues
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            backgroundColor: 'var(--input-background)',
+            borderRadius: 'var(--radius-md)',
+            '& fieldset': {
+              borderColor: 'transparent',
+            },
+            '&:hover fieldset': {
+              borderColor: 'var(--border)',
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: 'var(--ring)',
+            },
+          },
         },
       },
     },
