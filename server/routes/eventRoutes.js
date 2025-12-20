@@ -1,0 +1,48 @@
+const express = require('express');
+const router = express.Router();
+const { getJson } = require('serpapi');
+
+// --- Main Search Route ---
+router.get('/search-events', async (req, res) => {
+  // We still destructure dates to avoid errors, but we won't use them in the search.
+  const { destination, category } = req.query;
+
+  try {
+    // 1. Construct the base query
+    // "Music events in Varanasi"
+    const queryTerm = category ? category : "events";
+    const fullQuery = `${queryTerm} in ${destination}`;
+
+    const searchOptions = {
+      engine: "google_events",
+      q: fullQuery,
+      api_key: process.env.SERP_API_KEY, 
+      gl: "in",
+      hl: "en"
+      // REMOVED: htichips (No date constraints applied)
+    };
+
+    console.log("Searching with options (No Date Filters):", { 
+        q: searchOptions.q 
+    });
+
+    // 2. Execute Search
+    const response = await getJson(searchOptions);
+    
+    // 3. Debugging & Error Handling
+    if (!response.events_results || response.events_results.length === 0) {
+        console.log("⚠️ No events found.");
+        console.log("Debug URL:", response.search_metadata?.google_url);
+        return res.json([]); 
+    }
+
+    // 4. Send all top results back to frontend
+    res.json(response.events_results);
+    
+  } catch (error) {
+    console.error("SerpApi Error:", error);
+    res.status(500).json({ error: "Server Error" });
+  }
+});
+
+module.exports = router;

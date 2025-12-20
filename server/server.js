@@ -1,33 +1,30 @@
-const express = require("express");
-const cors = require("cors");
-const mongoose = require("mongoose");
-require("dotenv").config();
-
+const express = require('express');
+const cors = require('cors');
+require('dotenv').config();
+const connectDB = require('./db'); // Import the DB function
+const eventRoutes = require('./routes/eventRoutes');
+const aiRoutes = require('./routes/aiRoutes');
+const weatherRoutes = require("./routes/weatherRoutes");
+const plannerRoutes = require("./routes/plannerRoutes");
 const app = express();
 
-// Middlewares
-app.use(cors());
+// Initialize Database
+connectDB();
+
+// Middleware
+app.use(cors()); 
 app.use(express.json());
 
-// 🔹 MongoDB connection
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
-
-// Test route
-app.get("/api/test", (req, res) => {
-  res.json({
-    message: "Hello from the backend! The server is up and running.",
-  });
+// Routes
+app.use('/api', eventRoutes);
+app.use('/api/ai', aiRoutes);
+app.use("/api/weather", weatherRoutes);
+app.use("/api/planner", plannerRoutes);
+app.get('/api/test', (req, res) => {
+  res.json({ status: "Server is healthy and running" });
 });
 
-// Routes (enable later)
-// const tripRoutes = require("./routes/trips");
-// app.use("/api/trips", tripRoutes);
-
 const PORT = process.env.PORT || 5000;
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
