@@ -359,7 +359,7 @@ function HomePage() {
         ) : (
           <div className="space-y-20">
             <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              <div onClick={() => onSelectMode('manual')} className="group relative bg-white rounded-[2.5rem] p-10 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-blue-500 h-[420px] flex flex-col shadow-sm">
+              <div onClick={() => onSelectMode('manual')} className="group relative bg-white rounded-[2.5rem] p-10 hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-blue-500 h-[420px] flex flex-col shadow-sm">
                 <div className="relative flex-grow">
                   <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-blue-600"><User size={32} /></div>
                   <h3 className="text-2xl font-bold mb-4 text-gray-900">Custom Manual Plan</h3>
@@ -371,7 +371,7 @@ function HomePage() {
                 </Button>
               </div>
 
-              <div onClick={() => onSelectMode('ai')} className="group relative bg-white rounded-[2.5rem] p-10 shadow-xl hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-purple-500 h-[420px] flex flex-col shadow-sm">
+              <div onClick={() => onSelectMode('ai')} className="group relative bg-white rounded-[2.5rem] p-10 hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-purple-500 h-[420px] flex flex-col shadow-sm">
                 <div className="relative flex-grow">
                   <div className="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-purple-600"><Sparkles size={32} /></div>
                   <h3 className="text-2xl font-bold mb-4 text-gray-900">AI Instant Advisor</h3>
