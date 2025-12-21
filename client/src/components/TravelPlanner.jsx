@@ -1,4 +1,5 @@
 import { useState } from "react";
+import HotelList from "./HotelList.jsx";
 
 const styles = {
   page: {
@@ -85,6 +86,8 @@ const TravelPlanner = () => {
 
   const [plan, setPlan] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hotels, setHotels] = useState([]);
+
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -179,6 +182,10 @@ const TravelPlanner = () => {
           </div>
         </div>
       )}
+      {/* HOTELS */}
+{plan && (
+  <HotelList destination={form.destination} />
+)}
     </div>
   );
 };
