@@ -15,7 +15,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
-    "mongoose": "^8.20.3"
+    "google-search-results-nodejs": "^2.1.0",
+    "mongoose": "^8.20.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"
