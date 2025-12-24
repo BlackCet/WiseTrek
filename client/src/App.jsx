@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage';
 import AiResponse from './pages/AiResponse';
 import ChatBot from './components/ChatBot';
 import ManualPlanner from './pages/ManualPlanner';
-
+import OAuthSuccess from './components/OAuthSuccess';
 function App() {
   return (
     <Router>
@@ -22,6 +22,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/ai-planner" element={<AiResponse />} />
             <Route path="/manual-planner" element={<ManualPlanner />} />
+            <Route path="/oauth-success" element={<OAuthSuccess />} />
           </Routes>
         </main>
 

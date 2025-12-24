@@ -1,6 +1,13 @@
 <!doctype html>
 <html lang="en">
   <head>
+   <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               script-src 'self' 'unsafe-inline' 'unsafe-eval'; 
+               style-src 'self' 'unsafe-inline'; 
+               img-src 'self' data: blob:; 
+               connect-src 'self' http://localhost:5001 ws://localhost:*; 
+               font-src 'self' data: https://fonts.gstatic.com;">
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="#" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,5 +16,8 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script nonce="eF0eILyBNXAiomz34AEydA">
+  console.log("This inline script will now run!");
+</script>
   </body>
 </html>

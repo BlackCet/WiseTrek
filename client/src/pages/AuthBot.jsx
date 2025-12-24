@@ -1,185 +1,182 @@
-import React, { useState, useEffect } from 'react';
-import { X, User, Lock, Mail, MessageSquare } from 'lucide-react';
-import { Button, CircularProgress } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { X, User, MessageSquare, Chrome } from 'lucide-react';
+import { CircularProgress } from '@mui/material';
+import axios from 'axios';
 
-// --- Helper: Chat Message Component ---
-const ChatMessage = ({ message }) => {
-  const isBot = message.sender === 'bot';
-  return (
-    <div className={`flex ${isBot ? 'justify-start' : 'justify-end'} mb-4 animate-in fade-in slide-in-from-bottom-2`}>
-      <div className={`max-w-[80%] p-4 rounded-2xl shadow-sm ${
-        isBot 
-        ? 'bg-gray-100 text-gray-800 rounded-bl-none' 
-        : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-none'
-      }`}>
-        <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.text}</p>
-        <p className={`text-[10px] mt-1 opacity-50 ${isBot ? 'text-gray-500' : 'text-white'}`}>
-          {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </p>
-      </div>
-    </div>
-  );
-};
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 export function AuthBot({ onClose, onSuccess, initialMode = 'login' }) {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [mode, setMode] = useState(initialMode);
+  const [mode, setMode] = useState(initialMode); // 'login' or 'signup'
   const [step, setStep] = useState('welcome');
   const [authData, setAuthData] = useState({});
+  
+  // Ref to prevent double-greeting in React Strict Mode
+  const hasGreeted = useRef(false);
 
   useEffect(() => {
-    // Initial Greeting
+    // Reset state when mode changes
+    setMessages([]);
+    hasGreeted.current = false;
+    
     const timer = setTimeout(() => {
-      if (mode === 'login') {
-        addBotMessage("👋 Welcome back! Let's get you signed in.\n\nPlease enter your email address to continue.");
-        setStep('email');
-      } else {
-        addBotMessage("🎉 Great! Let's create your WiseTrek account.\n\nFirst, what's your full name?");
-        setStep('name');
+      if (!hasGreeted.current) {
+        if (mode === 'login') {
+          addBotMessage("👋 Welcome back! Please enter your email to sign in.");
+          setStep('email');
+        } else {
+          addBotMessage("🎉 Let's get started! What's your full name?");
+          setStep('name');
+        }
+        hasGreeted.current = true;
       }
-    }, 500);
+    }, 600);
     return () => clearTimeout(timer);
   }, [mode]);
 
   const addBotMessage = (text) => {
     setIsTyping(true);
     setTimeout(() => {
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        text,
-        sender: 'bot',
-        timestamp: new Date()
-      }]);
+      setMessages(p => [...p, { id: Date.now(), text, sender: 'bot', timestamp: new Date() }]);
       setIsTyping(false);
-    }, 800);
+    }, 600);
   };
 
-  const handleSendMessage = (e) => {
+  const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    const val = inputText.trim();
+    if (!val || isTyping) return;
 
-    const userMsg = inputText;
     setInputText('');
-    setMessages(prev => [...prev, {
-      id: Date.now().toString(),
-      text: userMsg,
-      sender: 'user',
-      timestamp: new Date()
-    }]);
+    setMessages(p => [...p, { id: Date.now(), text: val, sender: 'user', timestamp: new Date() }]);
 
-    // Logic Tree
-    if (mode === 'login') {
-      handleLoginFlow(userMsg);
-    } else {
-      handleSignupFlow(userMsg);
-    }
-  };
-
-  const handleLoginFlow = (msg) => {
-    if (step === 'email') {
-      if (!msg.includes('@')) {
-        addBotMessage("Hmm, that doesn't look like a valid email. 🤔 Please try again.");
-        return;
+    try {
+      if (mode === 'login') {
+        if (step === 'email') {
+          setAuthData({ emailOrMobile: val });
+          setStep('password');
+          addBotMessage("Got it! ✓ Now enter your password.");
+        } else if (step === 'password') {
+          setIsTyping(true);
+          const res = await axios.post(`${API_URL}/login`, { 
+            emailOrMobile: authData.emailOrMobile, 
+            password: val 
+          });
+          addBotMessage("✅ Login successful! Redirecting...");
+          setTimeout(() => onSuccess(res.data), 1000);
+        }
+      } else {
+        // Signup Flow
+        if (step === 'name') {
+          setAuthData({ name: val });
+          setStep('email');
+          addBotMessage(`Hi ${val}! 👋 What's your email address?`);
+        } else if (step === 'email') {
+          setAuthData(p => ({ ...p, email: val }));
+          setStep('password');
+          addBotMessage("Perfect! Now create a secure password.");
+        } else if (step === 'password') {
+          setIsTyping(true);
+          const res = await axios.post(`${API_URL}/signup`, { 
+            name: authData.name, 
+            email: authData.email, 
+            password: val 
+          });
+          addBotMessage(`🚀 Account created! Welcome aboard, ${authData.name}!`);
+          setTimeout(() => onSuccess(res.data), 1000);
+        }
       }
-      setAuthData(prev => ({ ...prev, email: msg }));
-      setStep('password');
-      addBotMessage("Got it! ✓ Now, please enter your password.");
-    } else if (step === 'password') {
-      setStep('authenticating');
-      addBotMessage("🔐 Authenticating your credentials...");
-      // Simulate Backend call
-      setTimeout(() => {
-        addBotMessage("✅ Success! Welcome back to WiseTrek.");
-        setTimeout(() => onSuccess({ name: "Traveler", email: authData.email }), 1000);
-      }, 2000);
-    }
-  };
-
-  const handleSignupFlow = (msg) => {
-    if (step === 'name') {
-      setAuthData(prev => ({ ...prev, name: msg }));
-      setStep('email');
-      addBotMessage(`Nice to meet you, ${msg}! 👋 What's your email address?`);
-    } else if (step === 'email') {
-      if (!msg.includes('@')) {
-        addBotMessage("Please enter a valid email address.");
-        return;
-      }
-      setAuthData(prev => ({ ...prev, email: msg }));
-      setStep('password');
-      addBotMessage("Perfect! Now create a secure password.");
-    } else if (step === 'password') {
-      setStep('authenticating');
-      addBotMessage("🚀 Creating your profile...");
-      setTimeout(() => {
-        addBotMessage(`✅ Account created! Welcome aboard, ${authData.name}!`);
-        setTimeout(() => onSuccess({ name: authData.name, email: authData.email }), 1000);
-      }, 2000);
+    } catch (err) {
+      const errorMsg = err.response?.data?.msg || "Something went wrong.";
+      addBotMessage(`❌ ${errorMsg}`);
+      // Keep them at the current step to try again
+    } finally {
+      setIsTyping(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 font-sans">
       <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[600px] animate-in zoom-in-95 duration-300">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 flex items-center justify-between">
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
               <User size={20} />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white leading-none">
+              <h2 className="text-xl font-bold leading-none">
                 {mode === 'login' ? 'Welcome Back' : 'Join WiseTrek'}
               </h2>
-              <p className="text-[10px] text-white/70 uppercase tracking-widest mt-1">Auth Assistant</p>
+              <p className="text-[10px] uppercase tracking-widest mt-1 opacity-70">Auth Assistant</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white/80 hover:text-white transition-colors">
+          <button onClick={onClose} className="hover:rotate-90 transition-transform">
             <X size={24} />
           </button>
         </div>
 
         {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-6 bg-gray-50/50">
-          {messages.map(m => <ChatMessage key={m.id} message={m} />)}
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/50">
+          {messages.map(m => (
+            <div key={m.id} className={`flex ${m.sender === 'bot' ? 'justify-start' : 'justify-end'}`}>
+              <div className={`p-4 rounded-2xl max-w-[85%] shadow-sm ${
+                m.sender === 'bot' 
+                ? 'bg-white text-gray-800 rounded-bl-none' 
+                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-none'
+              }`}>
+                <p className="text-sm leading-relaxed">{m.text}</p>
+              </div>
+            </div>
+          ))}
           {isTyping && (
-            <div className="flex justify-start mb-4">
-              <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-none">
+            <div className="flex justify-start">
+              <div className="bg-white p-3 rounded-2xl rounded-bl-none shadow-sm">
                 <CircularProgress size={16} thickness={6} className="text-blue-500" />
               </div>
             </div>
           )}
         </div>
 
-        {/* Input Area */}
+        {/* Footer / Input Area */}
         <div className="p-4 bg-white border-t border-gray-100">
-          <form onSubmit={handleSendMessage} className="relative">
-            <input
+          <form onSubmit={handleSendMessage} className="relative mb-3">
+            <input 
               type={step === 'password' ? 'password' : 'text'}
+              className="w-full bg-gray-100 p-4 rounded-2xl outline-none text-sm focus:ring-2 focus:ring-blue-500 transition-all" 
               value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
+              onChange={e => setInputText(e.target.value)}
               placeholder="Type your reply here..."
-              className="w-full bg-gray-100 border-none rounded-2xl px-5 py-4 pr-12 text-sm focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+              disabled={isTyping}
             />
             <button 
-              type="submit"
+              type="submit" 
               className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center hover:bg-blue-700 transition-colors"
             >
               <MessageSquare size={18} />
             </button>
           </form>
-          
+
+          {/* SOCIAL LOGIN */}
           <button 
-            onClick={() => {
-              setMode(mode === 'login' ? 'signup' : 'login');
-              setMessages([]);
-            }}
-            className="w-full text-center mt-3 text-xs text-gray-400 hover:text-blue-600 transition-colors font-medium"
+            onClick={() => window.location.href = `${API_URL}/google`}
+            className="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl text-sm font-medium hover:bg-gray-50 transition-colors mb-3"
           >
-            {mode === 'login' ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+            <Chrome size={18} className="text-blue-500" /> 
+            Continue with Google
+          </button>
+
+          {/* MODE TOGGLE (The part I added back) */}
+          <button 
+            onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
+            className="w-full text-center text-xs text-gray-400 hover:text-blue-600 font-medium transition-colors"
+          >
+            {mode === 'login' 
+              ? "Don't have an account? Create one" 
+              : "Already have an account? Sign in"}
           </button>
         </div>
       </div>
