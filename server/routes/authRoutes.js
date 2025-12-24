@@ -16,13 +16,13 @@ router.get('/google', passport.authenticate('google', {
 }));
 const frontendURL = process.env.CLIENT_URL || 'http://localhost:5173';
 router.get('/google/callback', 
-    passport.authenticate('google', { session: false, failureRedirect: `${frontendURL}/login?error=failed` }),
+    passport.authenticate('google', { session: false, failureRedirect: `http://localhost:5173/login?error=failed` }),
     (req, res) => {
-        // Successful authentication, create JWT
         const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
         
-        // Redirect back to frontend
-        res.redirect(`${process.env.CLIENT_URL}/oauth-success?token=${token}`);
+        // Use the variable you defined above or a hardcoded fallback
+        const targetURL = process.env.CLIENT_URL || 'http://localhost:5173';
+        res.redirect(`${targetURL}/oauth-success?token=${token}`);
     }
 );
 
