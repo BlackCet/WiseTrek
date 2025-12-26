@@ -20,9 +20,9 @@ app.use("/api/planner", plannerRoutes);
 
 // 4. Critical Key Check
 // This logs a warning if your SerpApi key is missing from .env
-if (!process.env.SERP_API_KEY) {
-    console.warn("⚠️ WARNING: SERP_API_KEY is not defined in .env file. Train search will fail.");
-}
+// if (!process.env.SERP_API_KEY) {
+//     console.warn("⚠️ WARNING: SERP_API_KEY is not defined in .env file. Train search will fail.");
+// }
 
 // 5. MongoDB connection
 if (!process.env.MONGO_URI) {
