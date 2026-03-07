@@ -1,13 +1,13 @@
-const User = require('../models/User');
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
+import User from '../models/User.js';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 // Standardized Token Generator
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
-exports.signup = async (req, res) => {
+export const signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
     // 1. Check if user exists
@@ -37,7 +37,7 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   const { emailOrMobile, password } = req.body;
   try {
     // Look up by email (since you removed mobile)
@@ -61,6 +61,6 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.logoutUser = (req, res) => {
+export const logoutUser = (req, res) => {
   res.status(200).json({ msg: 'Logged out successfully' });
 };

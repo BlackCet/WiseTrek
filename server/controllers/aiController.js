@@ -1,11 +1,10 @@
-// controllers/aiController.js
-require('dotenv').config();
+import 'dotenv/config';
 
-exports.getTripPlan = async (req, res) => {
+export const getTripPlan = async (req, res) => {
   const { destination, category } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
 
-  // We use the exact URL that worked in your directTest.js
+  // Exact URL from your directTest.js
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const prompt = `
@@ -53,9 +52,7 @@ exports.getTripPlan = async (req, res) => {
       });
     }
 
-    // Extract the text content from the Google response structure
     const aiResponse = json.candidates[0].content.parts[0].text;
-
     res.json({ success: true, answer: aiResponse });
 
   } catch (error) {

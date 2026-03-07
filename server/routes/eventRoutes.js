@@ -1,15 +1,14 @@
-const express = require('express');
+import express from 'express';
+import { getJson } from 'serpapi'; // Modern import
+
 const router = express.Router();
-const { getJson } = require('serpapi');
 
 // --- Main Search Route ---
 router.get('/search-events', async (req, res) => {
-  // We still destructure dates to avoid errors, but we won't use them in the search.
   const { destination, category } = req.query;
 
   try {
     // 1. Construct the base query
-    // "Music events in Varanasi"
     const queryTerm = category ? category : "events";
     const fullQuery = `${queryTerm} in ${destination}`;
 
@@ -19,7 +18,6 @@ router.get('/search-events', async (req, res) => {
       api_key: process.env.SERP_API_KEY, 
       gl: "in",
       hl: "en"
-      // REMOVED: htichips (No date constraints applied)
     };
 
     console.log("Searching with options (No Date Filters):", { 
@@ -45,4 +43,4 @@ router.get('/search-events', async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router; // Modern export

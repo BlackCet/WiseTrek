@@ -1,7 +1,8 @@
-const express = require("express");
+import express from 'express';
+import { getTravelPlan } from '../controllers/plannerController.js';
+
 const router = express.Router();
-const { getTravelPlan } = require("../controllers/plannerController");
 
 router.get("/", getTravelPlan);
 
-module.exports = router;
+export default router;

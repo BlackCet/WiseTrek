@@ -1,16 +1,20 @@
-const express = require('express');
-const cors = require('cors');
-const passport = require('passport'); // New
-require('dotenv').config();
-require('./config/passport'); // Import Passport configuration
+import express from 'express';
+import cors from 'cors';
+import passport from 'passport';
+import 'dotenv/config';
 
-const connectDB = require('./db');
-const eventRoutes = require('./routes/eventRoutes');
-const aiRoutes = require('./routes/aiRoutes');
-const weatherRoutes = require("./routes/weatherRoutes");
-const plannerRoutes = require("./routes/plannerRoutes");
-const authRoutes = require("./routes/authRoutes"); // New Auth Routes
-const userRoutes = require('./routes/userRoutes');
+// NOTE: In ES Modules, you MUST include the .js extension for local files
+import './config/passport.js'; 
+import connectDB from './db.js';
+
+// Route Imports
+import eventRoutes from './routes/eventRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
+import weatherRoutes from './routes/weatherRoutes.js';
+import plannerRoutes from './routes/plannerRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+
 const app = express();
 
 // Initialize Database
@@ -18,27 +22,27 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Allow your frontend
+    origin: process.env.CLIENT_URL || 'http://localhost:5173',
     credentials: true
 }));
 app.use(express.json());
 
 // Initialize Passport
-app.use(passport.initialize()); // New
+app.use(passport.initialize());
 
 // Routes
-app.use('/api/auth', authRoutes); // Auth endpoint
+app.use('/api/auth', authRoutes);
 app.use('/api', eventRoutes);
-app.use('/api/ai', aiRoutes);
+app.use('/api/ai', aiRoutes); // This handles all /api/ai/... routes
 app.use("/api/weather", weatherRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use('/api/users', userRoutes);
 
 app.get('/api/test', (req, res) => {
-  res.json({ status: "Server is healthy and running" });
+    res.json({ status: "Station Master Server is healthy and running 🚂" });
 });
 
-const PORT = process.env.PORT || 5001; // Matches your .env
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

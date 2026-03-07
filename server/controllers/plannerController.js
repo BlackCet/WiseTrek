@@ -1,9 +1,9 @@
-const { getWeatherByCity, getWeatherRecommendation } = require("../services/weatherService");
+import { getWeatherByCity, getWeatherRecommendation } from '../services/weatherService.js';
 // Later:
 // const { getRoutes } = require("../services/routeService");
 // const { getEvents } = require("../services/eventService");
 
-const getTravelPlan = async (req, res) => {
+export const getTravelPlan = async (req, res) => {
   try {
     const { city } = req.query;
 
@@ -29,5 +29,3 @@ const getTravelPlan = async (req, res) => {
     res.status(500).json({ message: "Planner failed", error: error.message });
   }
 };
-
-module.exports = { getTravelPlan };
