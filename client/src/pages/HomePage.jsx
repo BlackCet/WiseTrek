@@ -1,154 +1,20 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Typography,
-  Button,
-  Paper,
-  TextField,
-  CircularProgress,
-  Container,
-  MenuItem,
-  Tooltip,
-  IconButton,
-} from "@mui/material";
-import {
-  MapPin,
-  Sparkles,
-  User,
-  X,
-  CloudSun,
-  Calendar,
-  Ticket,
-  Cloud,
-  CloudRain,
-  CloudSnow,
-  Sun,
-  Wind,
-  Route,
-  Wallet,
-  CalendarRange,
-  RotateCcw,
-  LogOut,
-} from "lucide-react";
+import { Typography, Button, Paper, TextField, CircularProgress, Container, MenuItem, Tooltip, IconButton } from "@mui/material";
+import { MapPin, User, X, Calendar, RotateCcw, LogOut } from "lucide-react";
+
 import apiService from "../services/apiService";
-import { AuthBot } from "./AuthBot";
+import { AuthBot } from "../components/AuthBot";
 import { useAuth } from "../hooks/useAuth";
+import { WeatherForecast } from "../components/WeatherForecast";
+import { EventListItem } from "../components/EventListItem";
+import { PlannerOptions } from "../components/PlannerOptions";
+import { classifyEvent, getCategoryStyles } from "../utils/eventUtils";
 import "../index.css";
-
-// --- LOGIC HELPERS ---
-
-const classifyEvent = (event) => {
-  const text = `${event.title} ${event.category || ""}`.toLowerCase();
-  if (text.includes("music") || text.includes("concert") || text.includes("dj") || text.includes("live")) return "concert";
-  if (text.includes("match") || text.includes("cricket") || text.includes("football") || text.includes("sports") || text.includes("cup") || text.includes("race")) return "sports";
-  if (text.includes("food") || text.includes("feast") || text.includes("dining") || text.includes("culinary") || text.includes("drink") || text.includes("restaurant")) return "food";
-  if (text.includes("fest") || text.includes("carnival") || text.includes("fair") || text.includes("gala") || text.includes("celebration")) return "festival";
-  return "culture";
-};
-
-const getCategoryStyles = (cat) => {
-  const styles = {
-    festival: { color: "from-pink-500 to-rose-500", emoji: "🎪" },
-    concert: { color: "from-purple-500 to-indigo-500", emoji: "🎵" },
-    sports: { color: "from-orange-500 to-red-500", emoji: "⚽" },
-    culture: { color: "from-blue-500 to-cyan-500", emoji: "🎭" },
-    food: { color: "from-green-500 to-emerald-500", emoji: "🍽️" },
-  };
-  return styles[cat] || { color: "from-gray-500 to-gray-600", emoji: "🎉" };
-};
-
-// --- SUB-COMPONENTS ---
-
-const WeatherForecast = ({ weather, location }) => {
-  const getWeatherIcon = (condition) => {
-    const cond = condition?.toLowerCase() || "";
-    if (cond.includes("sunny") || cond.includes("clear")) return <Sun className="w-8 h-8 text-yellow-500" />;
-    if (cond.includes("rain")) return <CloudRain className="w-8 h-8 text-blue-500" />;
-    if (cond.includes("snow")) return <CloudSnow className="w-8 h-8 text-blue-300" />;
-    if (cond.includes("wind")) return <Wind className="w-8 h-8 text-gray-400" />;
-    return <Cloud className="w-8 h-8 text-gray-500" />;
-  };
-
-  return (
-    <Paper elevation={0} className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg text-white">
-          <CloudSun size={28} />
-        </div>
-        <div>
-          <Typography variant="h5" className="font-black text-gray-900 leading-tight">Travel Forecast</Typography>
-          <p className="text-sm text-gray-500">Real-time conditions for {location}</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-6 text-center border border-blue-200">
-          <div className="flex justify-center mb-4">{getWeatherIcon(weather.condition)}</div>
-          <Typography variant="h3" className="font-black text-blue-900">{weather.temperature}°C</Typography>
-          <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mt-1">{weather.condition}</p>
-        </div>
-        <div className="bg-gray-50 rounded-3xl p-6 flex flex-col justify-center space-y-4 border border-gray-200">
-          <div className="flex justify-between font-medium">
-            <span className="text-gray-500">Feels Like</span>
-            <span className="text-gray-900">{weather.feelsLike}°C</span>
-          </div>
-          <div className="flex justify-between font-medium">
-            <span className="text-gray-500">Humidity</span>
-            <span className="text-gray-900">{weather.humidity}%</span>
-          </div>
-        </div>
-        <div className="bg-white rounded-3xl p-6 border-2 border-dashed border-blue-200 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center shrink-0">
-            <Sparkles className="text-blue-500" />
-          </div>
-          <p className="text-sm text-gray-700 italic">"💡 {weather.recommendation || "Perfect time to start your adventure!"}"</p>
-        </div>
-      </div>
-    </Paper>
-  );
-};
-
-const EventListItem = ({ event }) => {
-  const category = classifyEvent(event);
-  const { color, emoji } = getCategoryStyles(category);
-
-  return (
-    <div className="group relative bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-xl transition-all duration-300 mb-4 overflow-hidden shadow-sm">
-      <div className="flex gap-4 relative z-10">
-        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-r ${color} flex items-center justify-center text-3xl shrink-0 shadow-md transform group-hover:scale-110 transition-transform`}>
-          {emoji}
-        </div>
-        <div className="flex-1">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h4 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{event.title}</h4>
-              <span className={`inline-block px-3 py-0.5 rounded-full text-[10px] font-bold bg-gradient-to-r ${color} text-white uppercase tracking-wider mt-1`}>{category}</span>
-            </div>
-            <Button href={event.link} target="_blank" variant="contained" className={`rounded-full px-6 bg-gradient-to-r ${color} text-white font-bold text-xs shadow-lg`}>Get Tickets</Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 text-sm text-gray-500">
-            <div className="flex items-center gap-2"><Calendar className="w-4 h-4 text-blue-500" /><span>{event.date?.when || "TBD"}</span></div>
-            <div className="flex items-center gap-2"><MapPin className="w-4 h-4 text-purple-500" /><span>{event.venue?.name || "Local Venue"}</span></div>
-            <div className="flex items-center gap-2 text-green-600 font-semibold"><Ticket className="w-4 h-4" /><span>Official Entry</span></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const Feature = ({ icon, bg, title, desc }) => (
-  <div className="text-center group">
-    <div className={`w-14 h-14 rounded-full ${bg} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform shadow-sm`}>{icon}</div>
-    <h4 className="font-bold text-gray-900 text-sm mb-1">{title}</h4>
-    <p className="text-xs text-gray-500">{desc}</p>
-  </div>
-);
-
-// --- MAIN PAGE COMPONENT ---
 
 function HomePage() {
   const navigate = useNavigate();
-  const { user, login, logout } = useAuth(); // Auth Hook
+  const { user, login, logout } = useAuth(); 
 
   // States
   const [formData, setFormData] = useState({ destination: '', startDate: '', endDate: '', category: '' });
@@ -189,9 +55,7 @@ function HomePage() {
 
       const weatherRes = await fetch(`http://localhost:5001/api/weather?city=${formData.destination}`);
       const weatherData = await weatherRes.json();
-      if (weatherRes.ok) {
-        setWeather(weatherData);
-      }
+      if (weatherRes.ok) setWeather(weatherData);
     } catch (err) {
       console.error("Search Error:", err);
     } finally {
@@ -205,14 +69,14 @@ function HomePage() {
   };
 
   const handleAuthSuccess = (userData) => {
-    login(userData); // Set user in useAuth hook
+    login(userData);
     setShowAuth(false);
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 transition-all duration-500 font-sans">
       
-      {/* NAVIGATION HEADER */}
+      {/* HEADER */}
       <header className="px-6 py-6 max-w-7xl mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(0)}>
           <div className="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center shadow-lg">
@@ -239,27 +103,14 @@ function HomePage() {
               </Tooltip>
           </div>
         ) : (
-          <Button 
-            variant="outlined" 
-            onClick={() => setShowAuth(true)}
-            sx={{ 
-              borderRadius: '9999px', 
-              border: '2px solid #030213 !important', 
-              color: '#030213 !important', 
-              fontWeight: '700', 
-              px: 4,
-              backgroundColor: 'white',
-              textTransform: 'none'
-            }}
-          >
+          <Button variant="outlined" onClick={() => setShowAuth(true)}
+            sx={{ borderRadius: '9999px', border: '2px solid #030213 !important', color: '#030213 !important', fontWeight: '700', px: 4, backgroundColor: 'white', textTransform: 'none' }}>
             <User className="w-4 h-4 mr-2" /> Sign In
           </Button>
         )}
       </header>
 
-      {showAuth && (
-        <AuthBot onClose={() => setShowAuth(false)} onSuccess={handleAuthSuccess} />
-      )}
+      {showAuth && <AuthBot onClose={() => setShowAuth(false)} onSuccess={handleAuthSuccess} />}
 
       <Container maxWidth="lg" className="pt-12 pb-24">
         <div className="text-center mb-12">
@@ -267,14 +118,13 @@ function HomePage() {
           <p className="text-gray-500 text-lg max-w-2xl mx-auto">Discover the perfect blend of local events and real-time weather for your next adventure.</p>
         </div>
 
-        {/* SEARCH CARD */}
+        {/* SEARCH FORM */}
         <Paper elevation={0} className="p-6 md:p-8 rounded-[3rem] shadow-2xl bg-white border border-white mb-16 max-w-5xl mx-auto">
           <form onSubmit={handleSearch} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
               <div className="md:col-span-4">
                 <Typography className="text-xs font-bold text-gray-400 uppercase ml-2 mb-2 tracking-widest">Destination</Typography>
-                <TextField fullWidth placeholder="City name..." name="destination" value={formData.destination} onChange={handleChange} variant="standard" 
-                  InputProps={{ disableUnderline: true, startAdornment: <MapPin size={18} className="mr-2 text-blue-500" /> }} className="bg-gray-50 p-4 rounded-3xl" />
+                <TextField fullWidth placeholder="City name..." name="destination" value={formData.destination} onChange={handleChange} variant="standard" InputProps={{ disableUnderline: true, startAdornment: <MapPin size={18} className="mr-2 text-blue-500" /> }} className="bg-gray-50 p-4 rounded-3xl" />
               </div>
               <div className="md:col-span-3">
                 <Typography className="text-xs font-bold text-gray-400 uppercase ml-2 mb-2 tracking-widest">Start Date</Typography>
@@ -306,6 +156,7 @@ function HomePage() {
           </form>
         </Paper>
 
+        {/* CONDITIONAL RENDERING: RESULTS OR PLANNER OPTIONS */}
         {hasSearched ? (
           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-500">
              {weather && <WeatherForecast weather={weather} location={formData.destination} />}
@@ -327,7 +178,7 @@ function HomePage() {
                  events.map((item, index) => <EventListItem key={index} event={item} />)
                ) : (
                  <div className="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-gray-100 text-gray-400">
-                    No events found for this selection.
+                   No events found for this selection.
                  </div>
                )}
              </div>
@@ -348,52 +199,7 @@ function HomePage() {
              </div>
           </div>
         ) : (
-          <div className="space-y-20">
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {/* MANUAL PLAN CARD */}
-              <div onClick={() => onSelectMode('manual')} className="group relative bg-white rounded-[2.5rem] p-10 hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-blue-500 h-[420px] flex flex-col shadow-sm">
-                <div className="relative flex-grow">
-                  <div className="w-16 h-16 rounded-2xl bg-blue-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-blue-600"><User size={32} /></div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Custom Manual Plan</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">Take the driver's seat. Hand-pick every stop, hotel, and local activity with our step-by-step advisor.</p>
-                </div>
-                <Button 
-                  variant="contained" 
-                  fullWidth 
-                  onClick={(e) => { e.stopPropagation(); onSelectMode('manual'); }}
-                  className="w-full rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 !text-white hover:to-blue-800 font-bold py-3 shadow-lg"
-                  sx={{ textTransform: 'none' }}
-                >
-                  Start Planning
-                </Button>
-              </div>
-
-              {/* AI PLAN CARD */}
-              <div onClick={() => onSelectMode('ai')} className="group relative bg-white rounded-[2.5rem] p-10 hover:shadow-2xl transition-all duration-500 cursor-pointer border-2 border-transparent hover:border-purple-500 h-[420px] flex flex-col shadow-sm">
-                <div className="relative flex-grow">
-                  <div className="w-16 h-16 rounded-2xl bg-purple-100 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform text-purple-600"><Sparkles size={32} /></div>
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">AI Instant Advisor</h3>
-                  <p className="text-gray-600 text-lg leading-relaxed">Let our artificial intelligence craft the perfect day-trip instantly based on your mood and budget.</p>
-                </div>
-                <Button 
-                  variant="contained" 
-                  fullWidth 
-                  onClick={(e) => { e.stopPropagation(); onSelectMode('ai'); }}
-                  className="w-full rounded-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 !text-white font-bold py-3 shadow-lg"
-                  sx={{ textTransform: 'none' }}
-                >
-                  Let AI Plan
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto pb-10">
-               <Feature icon={<CloudSun className="text-blue-600"/>} bg="bg-blue-100" title="Live Weather" desc="Updated real-time"/>
-               <Feature icon={<Route className="text-purple-600"/>} bg="bg-purple-100" title="Smart Routes" desc="Optimized paths"/>
-               <Feature icon={<Wallet className="text-pink-600"/>} bg="bg-pink-100" title="Budgeting" desc="Cost management"/>
-               <Feature icon={<CalendarRange className="text-orange-600"/>} bg="bg-orange-100" title="Local Events" desc="Exclusive access"/>
-            </div>
-          </div>
+          <PlannerOptions onSelectMode={onSelectMode} />
         )}
       </Container>
     </div>
