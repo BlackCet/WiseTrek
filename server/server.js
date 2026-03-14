@@ -6,6 +6,7 @@ const eventRoutes = require('./routes/eventRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const weatherRoutes = require("./routes/weatherRoutes");
 const plannerRoutes = require("./routes/plannerRoutes");
+const hotelRoutes = require("./routes/hotelRoutes");
 const app = express();
 
 // Initialize Database
@@ -20,6 +21,7 @@ app.use('/api', eventRoutes);
 app.use('/api/ai', aiRoutes);
 app.use("/api/weather", weatherRoutes);
 app.use("/api/planner", plannerRoutes);
+app.use("/api/hotels", hotelRoutes);
 app.get('/api/test', (req, res) => {
   res.json({ status: "Server is healthy and running" });
 });
