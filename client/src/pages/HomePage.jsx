@@ -133,7 +133,7 @@ function HomePage() {
 
       <Container maxWidth="lg" className="pt-12 pb-24">
         <div className="text-center mb-14 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h1 className="text-5xl md:text-7xl font-black mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent leading-tight tracking-tight drop-shadow-sm">
+          <h1 className="text-5xl md:text-7xl font-black mb-6 bg-linear-to-r from-blue-600 via-purple-600 to-pink-500 bg-clip-text text-transparent leading-tight tracking-tight drop-shadow-sm">
             Where to next?
           </h1>
           <p className="text-gray-500 text-lg md:text-xl font-medium max-w-2xl mx-auto leading-relaxed">

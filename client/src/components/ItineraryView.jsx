@@ -152,7 +152,7 @@ export function ItineraryView({ planData, onBack }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center justify-center">
+      <div className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 flex flex-col items-center justify-center">
         <CircularProgress size={60} thickness={4} className="text-purple-600 mb-6" />
         <h2 className="text-2xl font-black text-gray-800">Architecting your journey...</h2>
         <p className="text-gray-500 font-semibold mt-2">Connecting to local APIs for {destination}</p>
@@ -161,7 +161,7 @@ export function ItineraryView({ planData, onBack }) {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-12">
+    <div className="min-h-screen bg-linear-to-br from-blue-50 via-purple-50 to-pink-50 pb-12">
       <header className="bg-white/80 backdrop-blur-md border-b border-gray-200 sticky top-0 z-40 shadow-sm print:hidden">
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
@@ -170,7 +170,7 @@ export function ItineraryView({ planData, onBack }) {
                 <ArrowLeft className="w-5 h-5 mr-2" /> Back
               </Button>
               <div>
-                <h1 className="text-2xl font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-2xl font-black bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Your Itinerary
                 </h1>
                 <p className="text-sm font-bold text-gray-500">{destination}</p>
@@ -192,7 +192,7 @@ export function ItineraryView({ planData, onBack }) {
       </header>
 
       <div id="printable-itinerary" className="max-w-7xl mx-auto px-6 py-8">
-        <div className="bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl p-6 mb-8 text-white shadow-xl print:hidden">
+        <div className="bg-linear-to-r from-green-500 to-emerald-500 rounded-2xl p-6 mb-8 text-white shadow-xl print:hidden">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
               <CheckCircle className="w-6 h-6" />
@@ -229,13 +229,13 @@ export function ItineraryView({ planData, onBack }) {
           <div className="space-y-6">
             {data.route && data.route.length > 0 ? data.route.map((stop, index) => (
               <div key={index} className="flex gap-4" style={{ pageBreakInside: 'avoid' }}>
-                <div className="w-16 h-16 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0 shadow-md">
+                <div className="w-16 h-16 rounded-xl bg-linear-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white flex-shrink-0 shadow-md">
                   <div className="text-center">
                     <div className="text-xs font-bold uppercase tracking-widest">Day</div>
                     <div className="text-xl font-black">{stop.day}</div>
                   </div>
                 </div>
-                <div className="flex-1 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100/50">
+                <div className="flex-1 bg-linear-to-r from-blue-50 to-purple-50 rounded-xl p-4 border border-blue-100/50">
                   <h4 className="text-lg font-bold mb-2 text-gray-900">{stop.name}</h4>
                   <div className="grid md:grid-cols-3 gap-3 text-sm font-medium text-gray-600">
                     <div><span className="text-gray-400 font-bold uppercase text-[10px] tracking-wider block mb-1">Duration</span> {stop.duration}</div>
