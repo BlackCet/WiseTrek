@@ -3,15 +3,16 @@ import { useNavigate, useLocation } from "react-router-dom"; // Added useLocatio
 import { Typography, Button, Paper, TextField, CircularProgress, Container, MenuItem, Tooltip, IconButton } from "@mui/material";
 import { MapPin, User, X, Calendar, RotateCcw, LogOut } from "lucide-react";
 import { CalendarDays, Compass } from "lucide-react";
-
+import "../index.css";
 import apiService from "../services/apiService";
 import { AuthBot } from "../components/AuthBot";
 import { useAuth } from "../context/AuthContext";
+import HotelList from "../components/HotelList";
 import { WeatherForecast } from "../components/WeatherForecast";
 import { EventListItem } from "../components/EventListItem";
 import { PlannerOptions } from "../components/PlannerOptions";
 import { classifyEvent, getCategoryStyles } from "../utils/eventUtils";
-import "../index.css";
+
 
 function HomePage() {
   const navigate = useNavigate();
@@ -273,6 +274,13 @@ function HomePage() {
           <div className="max-w-4xl mx-auto animate-in fade-in slide-in-from-bottom-5 duration-500">
              {weather && <WeatherForecast weather={weather} location={formData.destination} />}
 
+             {/* ✅ STAY RECOMMENDATIONS FIRST */}
+    <HotelList
+      destination={formData.destination}
+      startDate={formData.startDate}
+      endDate={formData.endDate}
+    />
+
              <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
                    <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center shadow-lg">
@@ -285,6 +293,8 @@ function HomePage() {
                 </Button>
              </div>
 
+
+
              <div className="space-y-4">
                {events.length > 0 ? (
                  events.map((item, index) => <EventListItem key={index} event={item} />)
@@ -294,6 +304,8 @@ function HomePage() {
                  </div>
                )}
              </div>
+
+             
 
              <div className="mt-12 p-8 bg-white rounded-3xl shadow-lg border border-gray-100">
                <div className="grid grid-cols-5 gap-4">
