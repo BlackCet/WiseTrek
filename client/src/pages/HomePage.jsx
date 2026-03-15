@@ -281,7 +281,7 @@ function HomePage() {
       endDate={formData.endDate}
     />
 
-             <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 mt-20">
                 <div className="flex items-center gap-3">
                    <div className="w-12 h-12 rounded-full bg-pink-500 flex items-center justify-center shadow-lg">
                       <Calendar className="w-6 h-6 text-white" />

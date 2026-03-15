@@ -1,6 +1,6 @@
-const { fetchHotelsFromSerpAPI } = require("../services/hotelService");
+import { fetchHotelsFromSerpAPI } from "../services/hotelService.js";
 
-const getHotels = async (req, res) => {
+export const getHotels = async (req, res) => {
   try {
     const {
       city,
@@ -32,5 +32,3 @@ const getHotels = async (req, res) => {
     res.status(500).json({ error: "Hotel fetch failed" });
   }
 };
-
-module.exports = { getHotels };

@@ -23,14 +23,15 @@ const HotelCard = ({ hotel }) => {
           <span>{hotel.address || "Central Location"}</span>
         </div>
 
-        {/* AI Review Placeholder */}
+       {/* AI Review */}
         <div className="bg-gray-50 border border-dashed border-gray-200 rounded-2xl p-4 mb-4">
           <div className="flex items-center gap-2 mb-1 text-purple-600 font-bold text-sm">
             <Sparkles size={16} />
             AI Review Summary
           </div>
           <p className="text-gray-600 text-sm italic">
-            “Guests appreciate the location, clean rooms, and family-friendly atmosphere.”
+            {/* Inject the actual AI review here, with a fallback just in case */}
+            “{hotel.aiReview || "Guests appreciate the clean rooms and convenient location."}”
           </p>
         </div>
 
