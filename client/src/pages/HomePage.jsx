@@ -254,13 +254,13 @@ function HomePage() {
                 type="submit" 
                 fullWidth 
                 disabled={loading} 
-                className="h-14 md:h-16 rounded-full bg-[#030213] hover:bg-black text-white font-semibold text-lg transition-all duration-200 shadow-none hover:shadow-lg active:scale-[0.98] flex-[3]"
+                className="h-14 md:h-16 rounded-full bg-[#030213] hover:bg-black text-white font-semibold text-lg transition-all duration-200 shadow-none hover:shadow-lg active:scale-[0.98] flex-3"
               >
                 {loading ? <CircularProgress size={24} color="inherit" thickness={4} /> : "Discover Your Journey"}
               </Button>
               <Button 
                 onClick={handleClear} 
-                className="h-16 rounded-[1.5rem] bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 font-bold transition-all duration-300 border border-gray-100 flex-1 group" 
+                className="h-16 rounded-3xl bg-gray-50 hover:bg-red-50 text-gray-400 hover:text-red-500 font-bold transition-all duration-300 border border-gray-100 flex-1 group" 
               >
                 <RotateCcw size={20} className="mr-2 group-hover:-rotate-180 transition-transform duration-500" />
                 Clear
