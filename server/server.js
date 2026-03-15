@@ -14,6 +14,7 @@ import weatherRoutes from './routes/weatherRoutes.js';
 import plannerRoutes from './routes/plannerRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import hotelRoutes from './routes/hotelRoutes.js';
 
 const app = express();
 
@@ -37,7 +38,7 @@ app.use('/api/ai', aiRoutes); // This handles all /api/ai/... routes
 app.use("/api/weather", weatherRoutes);
 app.use("/api/planner", plannerRoutes);
 app.use('/api/users', userRoutes);
-
+app.use("/api/hotels", hotelRoutes);
 app.get('/api/test', (req, res) => {
     res.json({ status: "Station Master Server is healthy and running 🚂" });
 });
