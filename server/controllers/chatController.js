@@ -3,7 +3,6 @@ import { travelAgent } from '../services/ragService.js';
 export const handleChat = async (req, res) => {
     try {
         const { message } = req.body;
-        // Invoke your LangGraph Agent
         const result = await travelAgent.invoke({ input: message });
         
         res.json({ 
