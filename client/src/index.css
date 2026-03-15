@@ -6,3 +6,18 @@
   --color-wisetrek-300: #F8C794;
   --color-wisetrek-400: #D8AE7E;
 };
+
+@media print {
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    background: white !important;
+  }
+  .print\:hidden {
+    display: none !important;
+  }
+}
+
+@theme {
+  --font-sans: "Nunito", ui-sans-serif, system-ui, sans-serif;
+}

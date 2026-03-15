@@ -21,7 +21,7 @@ export const PlannerOptions = ({ onSelectMode }) => {
             <h3 className="text-2xl font-bold mb-4 text-gray-900">Custom Manual Plan</h3>
             <p className="text-gray-600 text-lg leading-relaxed">Take the driver's seat. Hand-pick every stop, hotel, and local activity with our step-by-step advisor.</p>
           </div>
-          <Button variant="contained" fullWidth onClick={(e) => { e.stopPropagation(); onSelectMode('manual'); }} className="w-full rounded-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 !text-white hover:to-blue-800 font-bold py-3 shadow-lg" sx={{ textTransform: 'none' }}>
+          <Button variant="contained" fullWidth onClick={(e) => { e.stopPropagation(); onSelectMode('manual'); }} className="w-full rounded-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 !text-white hover:to-blue-800 font-bold py-3 shadow-lg" sx={{ textTransform: 'none' }}>
             Start Planning
           </Button>
         </div>
@@ -33,7 +33,7 @@ export const PlannerOptions = ({ onSelectMode }) => {
             <h3 className="text-2xl font-bold mb-4 text-gray-900">AI Instant Advisor</h3>
             <p className="text-gray-600 text-lg leading-relaxed">Let our artificial intelligence craft the perfect day-trip instantly based on your mood and budget.</p>
           </div>
-          <Button variant="contained" fullWidth onClick={(e) => { e.stopPropagation(); onSelectMode('ai'); }} className="w-full rounded-full bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 !text-white font-bold py-3 shadow-lg" sx={{ textTransform: 'none' }}>
+          <Button variant="contained" fullWidth onClick={(e) => { e.stopPropagation(); onSelectMode('ai'); }} className="w-full rounded-full bg-linear-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 !text-white font-bold py-3 shadow-lg" sx={{ textTransform: 'none' }}>
             Let AI Plan
           </Button>
         </div>

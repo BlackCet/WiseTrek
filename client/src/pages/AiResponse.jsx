@@ -137,7 +137,7 @@ function AiResponse() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-20">
+    <div className="min-h-screen bg-linear-to-r from-blue-50 via-purple-50 to-pink-50 pb-20">
       <header className="p-6 max-w-7xl mx-auto flex items-center justify-between">
         <Button 
           onClick={() => navigate('/')} 
@@ -203,7 +203,7 @@ function AiResponse() {
         {/* RESULTS WINDOW */}
         {finalItinerary && (
           <Paper elevation={0} className="mt-10 p-8 md:p-12 rounded-[3rem] border border-white bg-white/90 shadow-2xl animate-in fade-in slide-in-from-bottom-10 duration-700">
-            <Typography variant="h4" className="font-black bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+            <Typography variant="h4" className="font-black bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
               Your Personalized Journey
             </Typography>
             <Divider className="mb-8" />

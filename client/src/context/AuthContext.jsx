@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
-import api from '../services/apiService';
+import { createContext, useState, useEffect, useContext } from 'react';
+import api from '../services/apiService'; // Make sure this path points to your ONE axios file
 
-export const useAuth = () => {
+export const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Function to fetch user data using the token in LocalStorage
   const refreshUser = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -14,7 +15,7 @@ export const useAuth = () => {
       return;
     }
     try {
-      const res = await api.get('/users/me'); // Backend route we discussed
+      const res = await api.get('/users/me'); 
       setUser(res.data.user);
     } catch (err) {
       console.error("Session expired or invalid token");
@@ -37,9 +38,15 @@ export const useAuth = () => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    // Optional: redirect to home
-    window.location.href = '/';
+    window.location.href = '/'; 
   };
 
-  return { user, loading, login, logout, refreshUser };
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser }}>
+      {!loading && children}
+    </AuthContext.Provider>
+  );
 };
+
+// Export your hook from here directly. Delete your old useAuth.js file entirely.
+export const useAuth = () => useContext(AuthContext);

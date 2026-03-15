@@ -100,7 +100,7 @@ function ChatBot() {
           }}
         >
           {/* Header */}
-          <Box className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-between">
+          <Box className="p-4 bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
@@ -124,7 +124,7 @@ function ChatBot() {
                   <div className={`p-3 rounded-2xl text-sm shadow-sm ${
                     msg.isBot 
                       ? 'bg-white text-gray-800 rounded-tl-none border border-gray-100' 
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-tr-none'
+                      : 'bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-tr-none'
                   }`}>
                     {msg.text}
                     <span className={`block text-[10px] mt-1 opacity-50 ${msg.isBot ? 'text-gray-500' : 'text-white'}`}>

@@ -102,7 +102,7 @@ export function AuthBot({ onClose, onSuccess, initialMode = 'login' }) {
       <div className="w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col h-[600px] animate-in zoom-in-95 duration-300">
         
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 flex items-center justify-between text-white">
+        <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 flex items-center justify-between text-white">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
               <User size={20} />
@@ -126,7 +126,7 @@ export function AuthBot({ onClose, onSuccess, initialMode = 'login' }) {
               <div className={`p-4 rounded-2xl max-w-[85%] shadow-sm ${
                 m.sender === 'bot' 
                 ? 'bg-white text-gray-800 rounded-bl-none' 
-                : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-br-none'
+                : 'bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-br-none'
               }`}>
                 <p className="text-sm leading-relaxed">{m.text}</p>
               </div>

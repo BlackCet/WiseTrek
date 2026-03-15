@@ -15,7 +15,7 @@ export const WeatherForecast = ({ weather, location }) => {
   return (
     <Paper elevation={0} className="bg-white rounded-[2.5rem] p-8 border border-gray-100 shadow-xl mb-12 animate-in fade-in slide-in-from-top-4 duration-500">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg text-white">
+        <div className="w-12 h-12 rounded-2xl bg-linear-to-r from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg text-white">
           <CloudSun size={28} />
         </div>
         <div>
@@ -24,7 +24,7 @@ export const WeatherForecast = ({ weather, location }) => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl p-6 text-center border border-blue-200">
+        <div className="bg-linear-to-r from-blue-50 to-blue-100 rounded-3xl p-6 text-center border border-blue-200">
           <div className="flex justify-center mb-4">{getWeatherIcon(weather.condition)}</div>
           <Typography variant="h3" className="font-black text-blue-900">{weather.temperature}°C</Typography>
           <p className="text-sm font-bold text-blue-600 uppercase tracking-widest mt-1">{weather.condition}</p>

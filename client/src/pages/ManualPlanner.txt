@@ -9,16 +9,14 @@ import {
   CircularProgress, 
   Container, 
   TextField, 
-  IconButton,
-  Tooltip
+  IconButton 
 } from '@mui/material';
 import { 
   ArrowLeft, 
   User, 
   Bot, 
   Send, 
-  ClipboardList,
-  FastForward // Added for the dev button
+  ClipboardList 
 } from 'lucide-react';
 import { ItineraryView } from '../components/ItineraryView'; 
 import '../index.css';
@@ -74,30 +72,6 @@ function ManualPlanner() {
     }, 1000);
   };
 
-  // --- DEV AUTOFILL FEATURE ---
-  const handleDevAutofill = () => {
-    const demoData = {
-      destination: "Delhi, India",
-      dates: "April 10 to April 14",
-      travelers: "2 adults",
-      budget: "Rs40000",
-      accommodation: "Mid-range hotels in Connaught Place",
-      transportation: "Metro and occasional auto-rickshaws",
-      activities: "Temples, local food, tea ceremonies, and nature walks"
-    };
-
-    setMessages([
-      { text: "👋 Hello! I'm your manual travel planner. I'll help you build a custom itinerary step-by-step.\n\nFirst, where are we heading?", isBot: true, timestamp: new Date() },
-      { text: "[DEV AUTOFILL ACTIVATED]", isBot: false, timestamp: new Date() }
-    ]);
-    
-    setInput("");
-    setPlanData(demoData);
-    setStep('processing');
-    handleFinalAPI(demoData);
-  };
-  // -----------------------------
-
   const handleSendMessage = async (textVal) => {
     const msg = textVal || input;
     if (!msg.trim()) return;
@@ -149,6 +123,7 @@ function ManualPlanner() {
     setStep(nextStep);
   };
 
+  // Adjusted this function
   const handleFinalAPI = (data) => {
     addBotMessage("🔧 Perfect. I have everything I need. Generating your custom structured itinerary now...");
     
@@ -199,18 +174,6 @@ function ManualPlanner() {
             </Box>
 
             <Box className="p-4 bg-white border-t flex gap-2">
-              {/* DEV AUTOFILL BUTTON */}
-              {step !== 'processing' && (
-                <Tooltip title="Dev Autofill: Skip straight to API">
-                  <IconButton 
-                    onClick={handleDevAutofill} 
-                    className="bg-purple-100 text-purple-600 hover:bg-purple-200"
-                  >
-                    <FastForward size={20} />
-                  </IconButton>
-                </Tooltip>
-              )}
-
               <TextField 
                 fullWidth 
                 placeholder={step === 'processing' ? "Generating plan..." : "Type your answer..."} 
