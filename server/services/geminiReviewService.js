@@ -1,12 +1,11 @@
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import 'dotenv/config';
 
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+export const generateHotelReview = async (hotel) => {
+  // Make sure this matches the exact spelling in your .env file
+  const apiKey = process.env.GEMINI_API_KEYY; 
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-const generateHotelReview = async (hotel) => {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
-    const prompt = `
+  const prompt = `
 Generate a short, realistic hotel review (1-2 lines):
 
 Hotel Name: ${hotel.name}
@@ -15,14 +14,32 @@ Location: ${hotel.address || "City center"}
 Price per night: ${hotel.pricePerNight}
 
 Do not mention Google or sources.
-    `;
+  `;
 
-    const result = await model.generateContent(prompt);
-    return result.response.text();
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
+
+  try {
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      console.error("Gemini API Error generating hotel review:", json);
+      // Fallback text if the AI fails so the UI doesn't break
+      return "Guests appreciate the comfortable stay and convenient location.";
+    }
+
+    const aiResponseText = json.candidates[0].content.parts[0].text;
+    return aiResponseText;
+
   } catch (err) {
-    console.error("Gemini review error:", err.message);
+    console.error("Gemini fetch error:", err.message);
     return "Guests appreciate the comfortable stay and convenient location.";
   }
 };
-
-module.exports = { generateHotelReview };
