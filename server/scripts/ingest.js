@@ -59,7 +59,7 @@ async function ingestTravelDoc(fileName) {
 }
 
 // EXECUTION: List your travel documents here
-const docsToIngest = ["wisetrek_handbook.pdf"];
+const docsToIngest = ["wisetrek_handbook3.pdf"];
 
 (async () => {
     for (const doc of docsToIngest) {
