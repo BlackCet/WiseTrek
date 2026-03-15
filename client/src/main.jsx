@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
+import { AuthProvider } from './context/AuthContext';
 import './index.css'; 
 
 // This theme pulls directly from your @theme inline CSS variables
@@ -29,13 +30,13 @@ const theme = createTheme({
   },
   
   typography: {
-    // Matches your CSS variable font-weights
-    fontFamily: 'Inter, system-ui, sans-serif',
+    // UPDATED: Now uses Nunito globally for MUI components
+    fontFamily: '"Nunito", system-ui, sans-serif',
     h1: { fontWeight: 500 }, 
     h2: { fontWeight: 500 },
     h3: { fontWeight: 500 },
     button: {
-      fontWeight: 500,
+      fontWeight: 600, // Bumped slightly for Nunito to look punchy
       textTransform: 'none', 
     }
   },
@@ -48,7 +49,6 @@ const theme = createTheme({
     MuiButton: {
       styleOverrides: {
         root: {
-          // Using the CSS variable ensures it updates if you change CSS
           borderRadius: 'var(--radius-lg)', 
           padding: '10px 24px',
           boxShadow: 'none',
@@ -97,9 +97,11 @@ const theme = createTheme({
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ThemeProvider theme={theme}>
-      <CssBaseline /> 
-      <App />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline /> 
+        <App />
+      </ThemeProvider>
+    </AuthProvider>
   </React.StrictMode>
 );

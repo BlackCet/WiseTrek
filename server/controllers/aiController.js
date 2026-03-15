@@ -1,58 +1,220 @@
-// controllers/aiController.js
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+import 'dotenv/config';
 
-// Initialize Gemini with your API Key
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-exports.getTripPlan = async (req, res) => {
+export const getTripPlan = async (req, res) => {
   const { destination, category } = req.body;
+  const apiKey = process.env.GEMINI_API_KEYY;
+
+  // Exact URL from your directTest.js
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  const prompt = `
+    Act as an expert local travel planner for ${destination}. 
+    Requirements: ${category}
+    
+    Create a day-by-day itinerary. 
+    Constraint: 80% focuses on interests, 20% is a "Local Wildcard" hidden gem for the evening.
+
+    RESPONSE FORMAT:
+    ### 📍 Day [X]: [Theme]
+    **🌅 Morning: Exploration**
+    * **Primary Activity:** [Name] - [Significance].
+    * **Breakfast:** [Eatery] - [Recommendation].
+
+    **☀️ Afternoon: Deep Dive**
+    * **Primary Activity:** [Name] - [Unique detail].
+    * **Lunch:** [Eatery] - [Local legend].
+
+    **🌙 Evening: The Local Wildcard**
+    * **Hidden Gem:** [Name] - [Soul of city].
+
+    **💡 Pro Tip:** [Logistics].
+    ---
+  `;
+
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }]
+  };
 
   try {
-    // 1. Select the model (Gemini 1.5 Flash is fastest/cheapest)
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    console.log(`[GEMINI API CALL] -> getTripPlan (Destination: ${destination})`);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
 
-    // 2. Construct the Prompt
-    const prompt = `
-     I am a traveler visiting ${destination}. 
-      My specific interest is: ${category || "General Sightseeing"}.
-      
-      Act as a sweet, nostalgic, and detail-oriented travel guide from the local place.
-    Create a 1-day itinerary that is rich in detail and storytelling.
+    const json = await response.json();
 
-      **CONTENT RULES:**
-      1. **The 80/20 Rule:** - The Morning and Afternoon activities (80%) MUST be strictly focused on my interest: "${category}".
-         - The Evening activity (20%) should be a surprise "Wildcard" recommendation from you—something unique I wouldn't expect.
-      2. **Tone:** Warm, nostalgic, and descriptive. Make me feel like I am stepping back in time.
-      3. **Formatting:** Use bullet points for readability, but you are free to write 15-20 words per point to fully describe the atmosphere.
+    if (!response.ok) {
+      console.error("Google API Error:", json);
+      return res.status(response.status).json({ 
+        success: false, 
+        error: json.error?.message || "AI is currently unavailable." 
+      });
+    }
 
-      **Structure the response exactly like this:**
-      
-      ### 🎩 A Vintage Day in ${destination}
-      
-      **🌅 Morning: [Activity Name based on ${category}]**
-      * [Describe the sights, smells, and why this specific spot is perfect for a lover of ${category}. Paint a picture.]
-      * **Breakfast:** [Specific recommendation for a classic or historic eatery].
-      
-      **☀️ Afternoon: [Activity Name based on ${category}]**
-      * [A deep dive into the culture of ${category} here. What should I look for? What details might I miss?]
-      * **Lunch:** [A spot that locals have loved for decades].
-      
-      **🌙 Evening: [The Wildcard Suggestion!]**
-      * [Surprise me! Pick a hidden gem, a jazz club, or a quiet view that has nothing to do with ${category} but captures the soul of the city.]
-      
-      **💡 Vintage Tip:** [A practical secret or etiquette tip for the modern traveler].
-    `;
-
-    // 3. Generate Content
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
-
-    // 4. Send back to Frontend
-    res.json({ success: true, answer: text });
+    const aiResponse = json.candidates[0].content.parts[0].text;
+    res.json({ success: true, answer: aiResponse });
 
   } catch (error) {
-    console.error("Gemini Error:", error);
-    res.status(500).json({ success: false, error: "AI is tired right now." });
+    console.error("Server Error:", error);
+    res.status(500).json({ success: false, error: "Internal server error." });
+  }
+};
+
+
+export const getStructuredTripPlan = async (req, res) => {
+  // Extracting the detailed fields sent from the ManualPlanner
+  const { 
+    destination, 
+    dates, 
+    travelers, 
+    budget, 
+    accommodation, 
+    transportation, 
+    activities 
+  } = req.body;
+
+  const apiKey = process.env.GEMINI_API_KEYY;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  // Clean up the budget string to a number for the AI to distribute mathematically
+  const numericBudget = parseInt(budget.replace(/[^0-9]/g, '')) || 3000;
+
+  const prompt = `
+    Act as a precise, expert travel planner. Create a realistic, logical itinerary for ${destination}.
+    
+    User Preferences:
+    - Dates/Duration: ${dates}
+    - Travelers: ${travelers}
+    - Total Budget: ${budget} (Distribute roughly ${numericBudget} among categories)
+    - Accommodation: ${accommodation}
+    - Transportation: ${transportation}
+    - Interests: ${activities}
+
+    You MUST return ONLY a valid JSON object matching exactly this schema:
+    {
+      "route": [
+        {
+          "day": 1,
+          "name": "Name of the neighborhood or main attraction",
+          "duration": "e.g., 8 hours",
+          "distance": "e.g., 5 km"
+        }
+      ],
+      "budget": {
+        "totalAmount": ${numericBudget},
+        "items": [
+          {
+            "category": "Name of category",
+            "amount": numeric_value,
+            "icon": "MUST BE ONE OF: plane, hotel, food, activities, shopping, other",
+            "breakdown": [
+              { "item": "Specific expense", "cost": numeric_value }
+            ]
+          }
+        ]
+      }
+    }
+
+    Rules:
+    1. Make the number of days in "route" match the implied duration in "${dates}". 
+    2. Sum of all budget item amounts MUST equal ${numericBudget}.
+    3. Keep breakdowns realistic for ${destination}.
+  `;
+
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      // This forces Gemini to respond with raw JSON, stripping the ```json formatting
+      responseMimeType: "application/json" 
+    }
+  };
+
+  try {
+    console.log(`[GEMINI API CALL] -> getStructuredTripPlan (Destination: ${destination})`);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const json = await response.json();
+
+    if (!response.ok) {
+      console.error("Google API Error:", json);
+      return res.status(response.status).json({ 
+        success: false, 
+        error: json.error?.message || "AI routing failed." 
+      });
+    }
+
+    // Since we forced application/json, this text is a parseable JSON string
+    const aiResponseText = json.candidates[0].content.parts[0].text;
+    const structuredData = JSON.parse(aiResponseText);
+
+    // Send the structured data directly inside a 'data' key to match the frontend expectation
+    res.json({ success: true, data: structuredData });
+
+  } catch (error) {
+    console.error("Server Error parsing AI structured output:", error);
+    res.status(500).json({ success: false, error: "Failed to generate structured plan." });
+  }
+};
+
+export const modifyStructuredTripPlan = async (req, res) => {
+  const { currentPlan, currentData, userInstruction } = req.body;
+  const apiKey = process.env.GEMINI_API_KEYY;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+  const prompt = `
+    Act as a precise, expert travel planner. You are modifying an existing itinerary based on a user's request.
+    
+    Current Trip Context:
+    Destination: ${currentData.destination}
+    Dates/Duration: ${currentData.dates}
+    Original Budget: ${currentData.budget}
+
+    Current Itinerary Data (JSON):
+    ${JSON.stringify(currentPlan)}
+
+    User Request for Modification:
+    "${userInstruction}"
+
+    Instructions:
+    Modify the "Current Itinerary Data" to fulfill the user's request. 
+    Keep the exact same JSON schema structure for "route" and "budget".
+    Adjust the budget breakdown if the user asked for cheaper/more expensive options, or changed activities.
+    Adjust the route if they wanted different pacing, activities, or days.
+    
+    You MUST return ONLY a valid JSON object matching exactly this schema:
+    {
+      "route": [ { "day": 1, "name": "...", "duration": "...", "distance": "..." } ],
+      "budget": { "totalAmount": 1000, "items": [ { "category": "...", "amount": 100, "icon": "...", "breakdown": [...] } ] }
+    }
+  `;
+
+  const payload = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { responseMimeType: "application/json" }
+  };
+
+  try {
+    console.log(`[GEMINI API CALL] -> modifyStructuredTripPlan (Instruction: "${userInstruction}")`);
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.error?.message || "AI modification failed.");
+
+    const structuredData = JSON.parse(json.candidates[0].content.parts[0].text);
+    res.json({ success: true, data: structuredData });
+
+  } catch (error) {
+    console.error("Modification Error:", error);
+    res.status(500).json({ success: false, error: "Failed to modify plan." });
   }
 };

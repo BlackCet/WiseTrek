@@ -1,6 +1,6 @@
-const { getWeatherByCity, getWeatherRecommendation } = require("../services/weatherService");
+import { getWeatherByCity, getWeatherRecommendation } from '../services/weatherService.js';
 
-const getWeather = async (req, res) => {
+export const getWeather = async (req, res) => {
   try {
     const { city } = req.query;
 
@@ -19,5 +19,3 @@ const getWeather = async (req, res) => {
     });
   }
 };
-
-module.exports = { getWeather };

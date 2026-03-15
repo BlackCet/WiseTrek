@@ -1,8 +1,12 @@
-// routes/aiRoutes.js
-const express = require('express');
+import express from 'express';
+import { getTripPlan, getStructuredTripPlan, modifyStructuredTripPlan } from '../controllers/aiController.js'; 
+import { handleChat } from '../controllers/chatController.js'; 
+
 const router = express.Router();
-const aiController = require('../controllers/aiController');
 
-router.post('/plan-trip', aiController.getTripPlan);
+router.post('/plan-trip', getTripPlan);
+router.post('/plan-trip-structured', getStructuredTripPlan);
+router.post('/modify-trip', modifyStructuredTripPlan);
+router.post('/chat', handleChat);
 
-module.exports = router;
+export default router;

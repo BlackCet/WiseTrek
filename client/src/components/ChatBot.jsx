@@ -26,24 +26,43 @@ function ChatBot() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!input.trim()) return;
+
+    // 1. Add User Message
     const userMsg = { text: input, isBot: false, timestamp: new Date() };
     setMessages((prev) => [...prev, userMsg]);
-    const lowerInput = input.toLowerCase();
+    
+    const currentInput = input;
     setInput("");
     setIsTyping(true);
 
-    setTimeout(() => {
-      let botResponse = DEFAULT_ANSWER;
-      const foundRule = KNOWLEDGE_BASE.find(rule => 
-        rule.keywords.some(keyword => lowerInput.includes(keyword))
-      );
-      if (foundRule) botResponse = foundRule.answer;
-      setMessages((prev) => [...prev, { text: botResponse, isBot: true, timestamp: new Date() }]);
-      setIsTyping(false);
-    }, 1200);
-  };
+    try {
+        // 2. Call your NEW Backend API
+        const response = await fetch('http://localhost:5001/api/ai/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: currentInput }),
+        });
+        
+        const data = await response.json();
+
+        // 3. Add Bot Message
+        setMessages((prev) => [...prev, { 
+            text: data.answer, 
+            isBot: true, 
+            timestamp: new Date() 
+        }]);
+    } catch (err) {
+        setMessages((prev) => [...prev, { 
+            text: "I'm sorry, traveler. The connection is weak.", 
+            isBot: true, 
+            timestamp: new Date() 
+        }]);
+    } finally {
+        setIsTyping(false);
+    }
+};
 
   return (
     <>
@@ -81,7 +100,7 @@ function ChatBot() {
           }}
         >
           {/* Header */}
-          <Box className="p-4 bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-between">
+          <Box className="p-4 bg-linear-to-r from-blue-600 to-purple-600 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
@@ -105,7 +124,7 @@ function ChatBot() {
                   <div className={`p-3 rounded-2xl text-sm shadow-sm ${
                     msg.isBot 
                       ? 'bg-white text-gray-800 rounded-tl-none border border-gray-100' 
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-tr-none'
+                      : 'bg-linear-to-r from-blue-600 to-purple-600 text-white rounded-tr-none'
                   }`}>
                     {msg.text}
                     <span className={`block text-[10px] mt-1 opacity-50 ${msg.isBot ? 'text-gray-500' : 'text-white'}`}>

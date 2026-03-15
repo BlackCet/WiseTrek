@@ -1,0 +1,60 @@
+// controllers/aiController.js
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+exports.getTripPlan = async (req, res) => {
+  const { destination, category } = req.body;
+
+  try {
+    // 1. Select the model (Note: Ensure the model name is correct, e.g., gemini-1.5-flash)
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+    // 2. Construct the Prompt to handle multi-day and the combined "category" string
+    const prompt = `
+      Act as an expert local travel planner for ${destination}. 
+      You are receiving user requirements in this format: "${category}". 
+      Note: This string contains their Preferences, Budget, and Duration.
+
+      **PLANNING CONSTRAINTS:**
+      1. **Duration:** Create a full itinerary covering the number of days specified in the requirements.
+      2. **The 80/20 Rule (Apply to EVERY day):**
+         - **Morning & Afternoon (80%):** Strictly curated around the user's primary interests/preferences. Select high-quality, relevant locations.
+         - **Evening (20%):** Provide a "Local Wildcard"—a hidden gem or unique experience (rooftop view, quiet alley, local haunt) unrelated to the primary interest.
+      3. **Logistics:** Group activities geographically within each day to minimize travel time.
+      4. **Budget:** Ensure the suggested eateries and activities align with the user's stated budget.
+      5. **Tone:** Insightful, practical, and authoritative. Focus on actionable details.
+
+      **RESPONSE FORMAT (Repeat for each day):**
+
+      ### 📍 Day [X]: [Theme of the Day] in ${destination}
+
+      **🌅 Morning: Exploration**
+      * **Primary Activity:** [Name of Location/Activity] - [Briefly explain significance].
+      * **Breakfast:** [Name of Eatery] - [Specific dish recommendation].
+
+      **☀️ Afternoon: Deep Dive**
+      * **Primary Activity:** [Name of Location/Activity] - [Provide a specific cultural/technical detail tourists miss].
+      * **Lunch:** [Name of Eatery] - [A legendary local spot].
+
+      **🌙 Evening: The Local Wildcard**
+      * **Hidden Gem:** [Specific Activity Name] - [Why this captures the true soul of the city].
+
+      **💡 Pro Tip for Day [X]:** [Logistical secret, etiquette, or timing tip].
+
+      ---
+    `;
+
+    // 3. Generate Content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    // 4. Send back to Frontend
+    res.json({ success: true, answer: text });
+
+  } catch (error) {
+    console.error("Gemini Error:", error);
+    res.status(500).json({ success: false, error: "The AI Advisor is currently over capacity." });
+  }
+};

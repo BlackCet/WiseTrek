@@ -5,7 +5,7 @@ async function rawTest() {
   const apiKey = process.env.GEMINI_API_KEY;
   
   // We will test the standard "gemini-pro" model directly
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const data = {
     contents: [{ parts: [{ text: "Hello, are you working?" }] }]
