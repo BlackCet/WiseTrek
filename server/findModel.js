@@ -1,4 +1,4 @@
-// findModel.js
+
 require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -23,7 +23,7 @@ async function testAllModels() {
       
       console.log("✅ WORKS!");
       console.log(`\n🎉 SUCCESS! Please update your aiController.js to use: "${modelName}"`);
-      return; // Stop after finding the first working one
+      return; 
     } catch (error) {
       if (error.message.includes("404")) {
         console.log("❌ Not Found (404)");

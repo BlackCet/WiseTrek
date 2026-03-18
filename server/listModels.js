@@ -1,4 +1,4 @@
-// listModels.js
+
 require('dotenv').config();
 
 async function listMyModels() {
@@ -14,11 +14,11 @@ async function listMyModels() {
     if (data.models) {
       console.log("\n✅ SUCCESS! Here are the models you can use:");
       console.log("---------------------------------------------");
-      // Filter for only 'generateContent' models (chat models)
+      
       const chatModels = data.models.filter(m => m.supportedGenerationMethods.includes("generateContent"));
       
       chatModels.forEach(m => {
-        console.log(`Name: ${m.name}`); // This is the EXACT string we need
+        console.log(`Name: ${m.name}`); 
         console.log(`Desc: ${m.description.substring(0, 60)}...`);
         console.log("---");
       });

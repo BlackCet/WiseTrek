@@ -1,4 +1,4 @@
-import axios from "axios"; // Change require to import
+import axios from "axios";
 
 export const getWeatherByCity = async (city) => {
   const apiKey = process.env.OPENWEATHER_API_KEY;
@@ -42,4 +42,3 @@ export const getWeatherRecommendation = (weather) => {
   return "Weather conditions are moderate. Plan accordingly.";
 };
 
-// No module.exports here!

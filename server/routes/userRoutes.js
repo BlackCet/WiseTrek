@@ -4,12 +4,9 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-// @route   GET /api/users/me
-// @desc    Get current user profile
-// @access  Private
+
 router.get('/me', protect, async (req, res) => {
   try {
-    // req.user is populated by the protect middleware
     res.json({
       user: {
         id: req.user._id,

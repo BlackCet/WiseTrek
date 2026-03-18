@@ -1,5 +1,5 @@
 import { getWeatherByCity, getWeatherRecommendation } from '../services/weatherService.js';
-// Later:
+
 // const { getRoutes } = require("../services/routeService");
 // const { getEvents } = require("../services/eventService");
 
@@ -14,7 +14,7 @@ export const getTravelPlan = async (req, res) => {
     const weather = await getWeatherByCity(city);
     const recommendation = getWeatherRecommendation(weather);
 
-    // TEMP placeholders (until teammates finish)
+    
     const routes = "Route module in progress 🚧";
     const events = "Event module in progress 🚧";
 

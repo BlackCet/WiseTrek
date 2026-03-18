@@ -1,11 +1,11 @@
 import { StateGraph, START, END, Annotation } from "@langchain/langgraph";
 import { ChatGroq } from "@langchain/groq";
 import { Index } from "@upstash/vector";
-import { TavilySearch } from "@langchain/tavily"; // Standard 2026 partner package
+import { TavilySearch } from "@langchain/tavily"; 
 import { z } from "zod";
 import 'dotenv/config';
 
-// 1. Initialize Components
+
 const index = new Index({ 
     url: process.env.UPSTASH_VECTOR_REST_URL, 
     token: process.env.UPSTASH_VECTOR_REST_TOKEN 
@@ -21,10 +21,7 @@ const tavily = new TavilySearch({
     maxResults: 3 
 });
 
-// 2. Define State
-// input: user query
-// plan: the steps the AI decides to take
-// pastSteps: context collected from Vector DB or Web
+
 const AgentState = Annotation.Root({
     input: Annotation(),
     plan: Annotation(),
@@ -35,8 +32,7 @@ const AgentState = Annotation.Root({
     response: Annotation(),
 });
 
-// 3. Nodes
-// Planner: Creates a strategy
+
 const plannerNode = async (state) => {
     const planSchema = z.object({ 
         steps: z.array(z.string()).describe("Steps to research the user request") 
@@ -50,14 +46,14 @@ const plannerNode = async (state) => {
     return { plan: res.steps };
 };
 
-// Executor: Performs RAG (Upstash) or Web Search (Tavily)
+
 const executorNode = async (state) => {
     const currentStepIndex = state.pastSteps.length;
     const step = state.plan[currentStepIndex];
     
     console.log(`🚂 Station Master executing step: ${step}`);
 
-    // Attempt 1: Upstash Vector Search (Handbook / PDF Knowledge)
+    
     const results = await index.query({ 
         data: step, 
         topK: 3, 
@@ -66,7 +62,7 @@ const executorNode = async (state) => {
     
     let context = results.map(r => r.data).filter(Boolean).join("\n\n");
 
-    // Attempt 2: Tavily Search (If handbook has no answer, check the live web)
+    
     if (!context || context.trim().length < 10) {
         console.log("📡 Handbook empty for this step. Consulting the telegraph (Web)...");
         const webResults = await tavily.invoke(step);
@@ -76,7 +72,7 @@ const executorNode = async (state) => {
     return { pastSteps: [context || "No information found."] };
 };
 
-// Synthesizer: Writes the final "Vintage" response
+
 const synthesizerNode = async (state) => {
     const finalAns = await model.invoke([
         ["system", `You are the WiseTrek Station Master. 
@@ -92,7 +88,7 @@ const synthesizerNode = async (state) => {
     ]);
     return { response: finalAns.content };
 };
-// 4. Define Graph Logic
+
 const shouldContinue = (state) => {
     if (state.pastSteps.length < state.plan.length) {
         return "execute";

@@ -2,7 +2,7 @@ import User from '../models/User.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
-// Standardized Token Generator
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
@@ -10,22 +10,22 @@ const generateToken = (id) => {
 export const signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
-    // 1. Check if user exists
+    
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json({ msg: 'Email already exists' });
 
-    // 2. Hash Password
+    
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // 3. Create User
+   
     const user = await User.create({ 
       name, 
       email, 
       password: hashedPassword 
     });
 
-    // 4. Send Response
+   
     res.status(201).json({
       msg: 'Signup successful',
       token: generateToken(user._id),
@@ -40,10 +40,10 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   const { emailOrMobile, password } = req.body;
   try {
-    // Look up by email (since you removed mobile)
+   
     const user = await User.findOne({ email: emailOrMobile });
     
-    // Check if user exists and has a password (Google users might not have one)
+    
     if (!user || !user.password) {
       return res.status(400).json({ msg: 'Invalid credentials' });
     }

@@ -1,7 +1,7 @@
 import 'dotenv/config';
 
 export const generateHotelReview = async (hotel) => {
-  // Make sure this matches the exact spelling in your .env file
+  
   const apiKey = process.env.GEMINI_API_KEYY; 
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
@@ -31,7 +31,7 @@ Do not mention Google or sources.
 
     if (!response.ok) {
       console.error("Gemini API Error generating hotel review:", json);
-      // Fallback text if the AI fails so the UI doesn't break
+      
       return "Guests appreciate the comfortable stay and convenient location.";
     }
 

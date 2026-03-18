@@ -1,10 +1,9 @@
-// directTest.js
+
 require('dotenv').config();
 
 async function rawTest() {
   const apiKey = process.env.GEMINI_API_KEY;
   
-  // We will test the standard "gemini-pro" model directly
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const data = {
@@ -25,7 +24,7 @@ async function rawTest() {
     if (!response.ok) {
       console.log("\n❌ RAW ERROR DETAILS:");
       console.log("------------------------------------------------");
-      console.log(JSON.stringify(json, null, 2)); // This prints the REAL reason
+      console.log(JSON.stringify(json, null, 2)); 
       console.log("------------------------------------------------");
     } else {
       console.log("\n✅ SUCCESS!");

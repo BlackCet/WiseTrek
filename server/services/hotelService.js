@@ -36,7 +36,7 @@ export const fetchHotelsFromSerpAPI = async ({
       let aiReview = "AI review unavailable";
 
      try {
-        // Safely extract snippets only if h.reviews is actually an array
+        
         const safeSnippets = Array.isArray(h.reviews) 
           ? h.reviews.map(r => r.snippet || "").slice(0, 3) 
           : [];

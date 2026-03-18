@@ -4,7 +4,7 @@ export const getTripPlan = async (req, res) => {
   const { destination, category } = req.body;
   const apiKey = process.env.GEMINI_API_KEYY;
 
-  // Exact URL from your directTest.js
+
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const prompt = `
@@ -64,7 +64,7 @@ export const getTripPlan = async (req, res) => {
 
 
 export const getStructuredTripPlan = async (req, res) => {
-  // Extracting the detailed fields sent from the ManualPlanner
+  
   const { 
     destination, 
     dates, 
@@ -78,7 +78,7 @@ export const getStructuredTripPlan = async (req, res) => {
   const apiKey = process.env.GEMINI_API_KEYY;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-  // Clean up the budget string to a number for the AI to distribute mathematically
+  
   const numericBudget = parseInt(budget.replace(/[^0-9]/g, '')) || 3000;
 
   const prompt = `
@@ -126,7 +126,7 @@ export const getStructuredTripPlan = async (req, res) => {
   const payload = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
-      // This forces Gemini to respond with raw JSON, stripping the ```json formatting
+      
       responseMimeType: "application/json" 
     }
   };
@@ -149,11 +149,11 @@ export const getStructuredTripPlan = async (req, res) => {
       });
     }
 
-    // Since we forced application/json, this text is a parseable JSON string
+    
     const aiResponseText = json.candidates[0].content.parts[0].text;
     const structuredData = JSON.parse(aiResponseText);
 
-    // Send the structured data directly inside a 'data' key to match the frontend expectation
+    
     res.json({ success: true, data: structuredData });
 
   } catch (error) {
