@@ -67,7 +67,7 @@ function HomePage() {
       const eventRes = await apiService.get("/search-events", { params: formData });
       setEvents(eventRes.data);
 
-      const weatherRes = await fetch(`http://localhost:5001/api/weather?city=${formData.destination}`);
+      const weatherRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/weather?city=${formData.destination}`);
       const weatherData = await weatherRes.json();
       if (weatherRes.ok) setWeather(weatherData);
     } catch (err) {

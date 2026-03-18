@@ -39,7 +39,7 @@ function ChatBot() {
 
     try {
         // 2. Call your NEW Backend API
-        const response = await fetch('http://localhost:5001/api/ai/chat', {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/ai/chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: currentInput }),

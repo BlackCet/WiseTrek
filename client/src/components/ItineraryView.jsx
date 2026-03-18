@@ -54,7 +54,7 @@ export function ItineraryView({ planData, onBack }) {
       }
 
       try {
-        const weatherRes = await fetch(`http://localhost:5001/api/weather?city=${destination}`);
+        const weatherRes = await fetch(`${import.meta.env.VITE_API_BASE_URL}/weather?city=${destination}`);
         if (weatherRes.ok) {
           weatherList = await weatherRes.json();
         }

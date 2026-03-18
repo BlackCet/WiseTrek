@@ -13,7 +13,7 @@ const HotelList = ({ destination, startDate, endDate }) => {
     const fetchHotels = async () => {
       setLoading(true);
       try {
-        const res = await axios.get("http://localhost:5001/api/hotels", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/hotels`, {
           params: {
             city: destination,
             checkIn: startDate,
