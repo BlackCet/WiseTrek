@@ -1,20 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
-   <meta http-equiv="Content-Security-Policy" 
-      content="default-src 'self'; 
-               script-src 'self' 'unsafe-inline' 'unsafe-eval'; 
-               style-src 'self' 'unsafe-inline'; 
-               img-src 'self' data: blob:; 
-               connect-src 'self' http://localhost:5001 ws://localhost:*; 
-               font-src 'self' data: https://fonts.gstatic.com;">
+    <meta http-equiv="Content-Security-Policy" 
+       content="default-src 'self'; 
+                script-src 'self' 'unsafe-inline' 'unsafe-eval'; 
+                style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                img-src 'self' data: blob: https://*; 
+                connect-src 'self' https://*.onrender.com http://localhost:5001 ws://localhost:*; 
+                font-src 'self' data: https://fonts.gstatic.com;">
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="#" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Wisetrek</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>
